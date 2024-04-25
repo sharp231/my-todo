@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../styles/globals.css';
+// import '../styles/globals.css';
 
 const TodoApp = () => {
   const [todos, setTodos] = useState(['水やりをする', '掃除をする']);
@@ -55,7 +55,6 @@ const TodoApp = () => {
   );
 };
 
-// export default TodoApp;
 
 export default function Home() {
   return(
