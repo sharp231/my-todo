@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-// import '../styles/globals.css';
+import '../styles/globals.css';
 
 const TodoApp = () => {
   const [todos, setTodos] = useState(['水やりをする', '掃除をする']);
-  // const [command, setCommand] = useState('');
+  const [command, setCommand] = useState('');
 
   const handleNewTodo = () => {
     const newTodo = prompt('新しいToDoを入力してください');
