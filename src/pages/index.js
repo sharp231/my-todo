@@ -53,7 +53,7 @@ const TodoApp = () => {
 
   return (
     <div>
-      <button onClick={handleCommand}>コマンドを入力</button>
+      <button onClick={handleCommand}>コマンドを入力をしてください。</button>
     </div>
   );
 };
