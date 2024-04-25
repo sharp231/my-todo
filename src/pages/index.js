@@ -33,7 +33,11 @@ const TodoApp = () => {
   };
 
   const handleCommand = () => {
-    const input = prompt('コマンドを入力してください(new, list, delete, quit)');
+    let input = prompt('コマンドを入力してください(new, list, delete, quit)');
+    while (input !== 'new' && input !== 'list' && input !== 'delete' && input !== 'quit' && input !== 'q') {
+      console.log('コマンドが間違っています(new, list, delete, quit)');
+      input = prompt('コマンドを入力してください(new, list, delete, quit)');
+    }
     if (input === 'new') {
       handleNewTodo();
     } else if (input === 'list') {
@@ -42,11 +46,10 @@ const TodoApp = () => {
       handleDeleteTodo();
     } else if (input === 'quit' || input === 'q') {
       console.log('アプリを終了します');
-    } else {
-      console.log('コマンドが間違っています(new, list, delete, quit)');
     }
     setCommand(input);
   };
+  
 
   return (
     <div>
