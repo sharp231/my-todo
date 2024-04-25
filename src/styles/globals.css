@@ -31,3 +31,118 @@ body {
     text-wrap: balance;
   }
 }
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
+  background-color: blue;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.heading {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.todoList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.todoItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background-color: #4caf50;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  margin-bottom: 0.5rem;
+}
+
+.todoItem button {
+  background-color: #f44336;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+}
+
+.todoForm {
+  display: flex;
+  margin-bottom: 1rem;
+}
+
+.todoForm input {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.todoForm button {
+  background-color: #4caf50;
+  color: #ccc;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  margin-left: 0.5rem;
+  cursor: pointer;
+}
+
+.commandButton {
+  display: block;
+  margin: 0 auto;
+  padding: 0.5rem 1rem;
+  background-color: #0070f3;
+  color: red;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button {
+  background-color: #4caf50; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+.buttonOutlineGradient {
+  /* 省略された他のスタイルはここに記述 */
+  background: linear-gradient(135deg, #6fa24a, #15a1cc);
+}
+
+.buttonOutlineGradient::before {
+  /* 省略された他のスタイルはここに記述 */
+  background: linear-gradient(135deg, #6fa24a, #15a1cc);
+  filter: blur(8px);
+  border-radius: 32px;
+  opacity: 0;
+}
+
+@media (any-hover: hover) {
+  .buttonOutlineGradient::before {
+    transition: opacity 0.2s;
+    will-change: filter;
+  }
+
+  .buttonOutlineGradient:hover::before {
+    opacity: 1;
+  }
+}
