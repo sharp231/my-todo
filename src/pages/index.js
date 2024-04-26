@@ -51,11 +51,16 @@ const TodoApp = () => {
   };
   
 
-  return (
-    <div>
-      <button onClick={handleCommand}>コマンドを入力をしてください。</button>
-    </div>
-  );
+return (
+  <div>
+    <button onClick={handleCommand}>コマンドを入力をしてください。</button>
+    <ul>
+      {todos.map((todo, index) => (
+        <li key={index}>{todo}</li>
+      ))}
+    </ul>
+  </div>
+);
 };
 
 
