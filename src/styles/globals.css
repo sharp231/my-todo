@@ -16,40 +16,28 @@
   }
 } */
 
+/* 全体の背景色 */
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background-color: #f5f5f5;
+  color: #333;
 }
 
+/* ヘッダー */
 h1 {
-  font-size: 2.5em;
+  font-size: 2rem;
   text-align: center;
-  color: white; 
+  color: #333;
+  margin-bottom: 1rem;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}
-
+/* コンテナ */
 .container {
   max-width: 600px;
   margin: 0 auto;
   padding: 1rem;
-  background-color: blue;
+  background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.heading {
-  text-align: center;
-  margin-bottom: 1rem;
 }
 
 .todoList {
@@ -63,132 +51,104 @@ h1 {
   align-items: center;
   justify-content: space-between;
   padding: 0.5rem 1rem;
-  background-color: #efefef;
+  background-color: #f9f9f9;
   border-radius: 4px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   margin-bottom: 0.5rem;
 }
 
-.todoItem button {
-  background-color: #f44336;
+.todoItem span {
+  color: #333;
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.left-container {
+  width: 60%;
+}
+
+.right-container {
+  width: 35%;
+}
+
+.commandButton {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background-color: #2196f3;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.todoList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.todoItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  margin-bottom: 0.5rem;
+}
+
+.todoItem span {
+  color: #333;
+}
+
+/* .todoItem button {
+  background-color: #e53935;
   color: #fff;
   border: none;
   border-radius: 4px;
   padding: 0.25rem 0.5rem;
   cursor: pointer;
-}
+} */
 
-.todoForm {
+/* .todoForm {
   display: flex;
   margin-bottom: 1rem;
-}
+} */
 
-.todoForm input {
+/* .todoForm input {
   flex: 1;
   padding: 0.5rem;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 1rem;
-}
+} */
 
-.todoForm button {
+/* .todoForm button {
   background-color: #4caf50;
-  color: #ccc;
+  color: #fff;
   border: none;
   border-radius: 4px;
   padding: 0.5rem 1rem;
   margin-left: 0.5rem;
   cursor: pointer;
-}
+} */
 
-.commandButton {
+/* コマンドボタン */
+/* .commandButton {
   display: block;
-  margin: 0 auto;
+  margin: 1rem auto 0;
   padding: 0.5rem 1rem;
-  background-color: #0070f3;
-  color: red;
+  background-color: #2196f3;
+  color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
 }
-
-button {
-  padding: 0;
-  font-family: inherit;
-  appearance: none;
-  cursor: pointer;
-  background-color: transparent;
-  border: none;
-  background-color: #007BFF; 
-  color: black;
-  border: none;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: whitesmoke;
-}
-
-
-
-.buttonOutlineGradient {
-  background: linear-gradient(135deg, #6fa24a, #15a1cc);
-}
-
-.buttonOutlineGradient::before {
-  background: linear-gradient(135deg, #6fa24a, #15a1cc);
-  filter: blur(8px);
-  border-radius: 32px;
-  opacity: 0;
-}
-
-@media (any-hover: hover) {
-  .buttonOutlineGradient::before {
-    transition: opacity 0.2s;
-    will-change: filter;
-  }
-
-  .buttonOutlineGradient:hover::before {
-    opacity: 1;
-  }
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-
-
-.buttonNeumorphism {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 80px;
-  aspect-ratio: 1;
-  color: #222;
-  background-color: #efefef;
-  border-radius: 50%;
-  box-shadow: -4px -4px 8px #fff, 4px 4px 8px rgba(0, 0, 0, 0.24);
-}
-
-@media (any-hover: hover) {
-  .buttonNeumorphism {
-    transition: box-shadow 0.2s;
-  }
-
-  .buttonNeumorphism:hover {
-    box-shadow: -2px -2px 4px #fff, 2px 2px 4px rgba(0, 0, 0, 0.24);
-  }
-
-  .buttonNeumorphism:active {
-    background-color: #ebebeb;
-    box-shadow: inset 4px 4px 8px rgba(0, 0, 0, 0.16);
-  }
-}
+ */

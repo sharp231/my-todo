@@ -4,7 +4,7 @@ import TodoApp from '.';
 
 export default function Home() {
   return (
-    <div className="container">
+    <div className='container'>
       <h1>Todo App</h1>
       <TodoApp />
     </div>

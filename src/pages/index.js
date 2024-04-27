@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-// import '../styles/globals.css';
 
 const TodoApp = () => {
   const [todos, setTodos] = useState(['水やりをする', '掃除をする']);
@@ -14,11 +13,11 @@ const TodoApp = () => {
   };
 
   const handleListTodos = () => {
-    console.log('********');
+    console.log('*********');
     todos.forEach((todo, index) => {
       console.log(`${index}: ${todo}`);
     });
-    console.log('********');
+    console.log('*********');
   };
 
   const handleDeleteTodo = () => {
@@ -26,18 +25,29 @@ const TodoApp = () => {
     if (!Number.isNaN(index) && index >= 0 && index < todos.length) {
       const deletedTodo = todos.splice(index, 1);
       setTodos([...todos]);
-      console.log(`${deletedTodo[0]}が削除されました`);
+      console.lxog(`${deletedTodo[0]}が削除されました`);
     } else {
       console.log('有効なインデックスを入力してください');
     }
   };
 
-  const handleCommand = () => {
+  const handleCommandInput = () => {
     let input = prompt('コマンドを入力してください(new, list, delete, quit)');
-    while (input !== 'new' && input !== 'list' && input !== 'delete' && input !== 'quit' && input !== 'q') {
+    while (
+      input !== 'new' &&
+      input !== 'list' &&
+      input !== 'delete' &&
+      input !== 'quit' &&
+      input !== 'q'
+    ) {
       console.log('コマンドが間違っています(new, list, delete, quit)');
       input = prompt('コマンドを入力してください(new, list, delete, quit)');
     }
+    return input;
+  };
+
+  const handleCommand = () => {
+    const input = handleCommandInput();
     if (input === 'new') {
       handleNewTodo();
     } else if (input === 'list') {
@@ -49,21 +59,32 @@ const TodoApp = () => {
     }
     setCommand(input);
   };
-  
 
   return (
-    <div>
-      <button onClick={handleCommand}>コマンドを入力をしてください。</button>
+    <div className='container'>
+      <div className='left-container'>
+        <ul className='todoList'>
+          {todos.map((todo, index) => (
+            <li key={index} className='todoItem'>
+              <span>{todo}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className='right-container'>
+        <button className='commandButton' onClick={handleCommand}>
+          コマンドを入力をしてください。
+        </button>
+      </div>
     </div>
   );
 };
 
-
 export default function Home() {
-  return(
-    <div className="container">
+  return (
+    <div className='app-container'>
       <h1>Todo App</h1>
-      <TodoApp/>
+      <TodoApp />
     </div>
   );
 }
