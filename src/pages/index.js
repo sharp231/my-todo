@@ -13,11 +13,11 @@ const TodoApp = () => {
   };
 
   const handleListTodos = () => {
-    console.log('*********');
+    // console.log('*********');
     todos.forEach((todo, index) => {
       console.log(`${index}: ${todo}`);
     });
-    console.log('*********');
+    // console.log('*********');
   };
 
   const handleDeleteTodo = () => {
