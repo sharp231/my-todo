@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 
 const TodoApp = () => {
   const [todos, setTodos] = useState(['水やりをする', '掃除をする']);
@@ -65,17 +66,28 @@ const TodoApp = () => {
       <div className='left-container'>
         <ul className='todoList'>
           {todos.map((todo, index) => (
-            <li key={index} className='todoItem'>
+            <motion.li
+              key={index}
+              className='todoItem'
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+            >
               <span>{todo}</span>
-            </li>
+            </motion.li>
           ))}
         </ul>
       </div>
-      <div className='right-container'>
+      <motion.div
+        className='right-container'
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
         <button className='commandButton' onClick={handleCommand}>
           コマンドを入力をしてください。
         </button>
-      </div>
+      </motion.div>
     </div>
   );
 };

@@ -16,18 +16,55 @@
   }
 } */
 
-/* 全体の背景色 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
-  background-color: #f5f5f5;
-  color: #333;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Poppins', sans-serif;
+  background: #0d3b66; /* 濃い青色 */
+  background: -webkit-linear-gradient(
+    to right,
+    #0d6ebc,
+    #0c57a3,
+    #0d3b66
+  ); /* ブルーのグラデーション */
+  background: linear-gradient(
+    to right,
+    #0d6ebc,
+    #0c57a3,
+    #0d3b66
+  ); /* ブルーのグラデーション */
+}
+
+.card {
+  background-color: #fff;
+  padding: 1.5rem 1.75rem;
+  cursor: pointer;
+  max-width: 300px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* カードに影を追加 */
+}
+
+@media (min-width: 480px) {
+  .card {
+    max-width: 480px;
+    padding: 2rem 2.5rem;
+  }
 }
 
 /* ヘッダー */
 h1 {
-  font-size: 2rem;
+  font-size: 3rem;
   text-align: center;
-  color: #333;
-  margin-bottom: 1rem;
+  color: black;
+  margin-bottom: 2rem;
 }
 
 /* コンテナ */
@@ -105,37 +142,5 @@ h1 {
 }
 
 .todoItem span {
-  color: #333;
+  color: black;
 }
-
-/* .todoItem button {
-  background-color: #e53935;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: 0.25rem 0.5rem;
-  cursor: pointer;
-} */
-
-/* .todoForm {
-  display: flex;
-  margin-bottom: 1rem;
-} */
-
-/* .todoForm input {
-  flex: 1;
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
-} */
-
-/* .todoForm button {
-  background-color: #4caf50;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: 0.5rem 1rem;
-  margin-left: 0.5rem;
-  cursor: pointer;
-} */
