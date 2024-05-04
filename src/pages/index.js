@@ -2,23 +2,30 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
 const TodoApp = () => {
-  const [todos, setTodos] = useState(['水やりをする', '掃除をする']);
+  const [todos, setTodos] = useState([]);
   const [command, setCommand] = useState('');
 
   const handleNewTodo = () => {
-    const newTodo = prompt('新しいToDoを入力してください');
-    if (newTodo) {
+    const newTodoText = prompt('新しいTodoを入力してください');
+    if (newTodoText) {
+      const newTodoDate = prompt('日付を入力してください(YYYY-MM-DD)');
+      const newTodoPriority = prompt(
+        '優先度を入力してください(low/medium/high)'
+      );
+      const newTodo = {
+        text: newTodoText,
+        date: newTodoDate,
+        priority: newTodoPriority,
+      };
       setTodos([...todos, newTodo]);
-      console.log(`${newTodo}が追加されました`);
+      console.log(`${newTodoText} が追加されました`);
     }
   };
 
   const handleListTodos = () => {
-    // console.log('*********');
     todos.forEach((todo, index) => {
       console.log(`${index}: ${todo}`);
     });
-    // console.log('*********');
   };
 
   const handleDeleteTodo = () => {
@@ -73,7 +80,9 @@ const TodoApp = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <span>{todo}</span>
+              <span>{todo.text}</span>
+              {todo.date && <span> (期日: {todo.date})</span>}
+              {todo.priority && <span> (優先度: {todo.priority})</span>}
             </motion.li>
           ))}
         </ul>
