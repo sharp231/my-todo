@@ -6,11 +6,11 @@ const TodoApp = () => {
   const [command, setCommand] = useState('');
 
   const handleNewTodo = () => {
-    const newTodoText = prompt('新しいTodoを入力してください');
+    const newTodoText = prompt('新しいTodoを入力');
     if (newTodoText) {
-      const newTodoDate = prompt('日付を入力してください(YYYY-MM-DD)');
+      const newTodoDate = prompt('日付を入力(YYYY-MM-DD)');
       const newTodoPriority = prompt(
-        '優先度を入力してください(low/medium/high)'
+        '優先度を入力(low/medium/high)'
       );
       const newTodo = {
         text: newTodoText,
@@ -18,7 +18,30 @@ const TodoApp = () => {
         priority: newTodoPriority,
       };
       setTodos([...todos, newTodo]);
-      console.log(`${newTodoText} が追加されました`);
+      console.log(`${newTodoText} が追加`);
+    }
+  };
+  const handleEditTodo = () => {
+    const index = parseInt(prompt('編集するToDoの番号を入力'), 10);
+    if (!Number.isNaN(index) && index >= 0 && index < todos.length) {
+      const newTodoText = prompt('新しいTodoを入力');
+      if (newTodoText) {
+        const newTodoDate = prompt('日付を入力(YYYY-MM-DD)');
+        const newTodoPriority = prompt(
+          '優先度を入力(low/medium/high)'
+        );
+        const newdatedTodo = {
+          text: newTodoText,
+          date: newTodoDate,
+          priority: newTodoPriority,
+        };
+        const newTodos = [...todos];
+        newTodos[index] = newdatedTodo;
+        setTodos(newTodos);
+        console.log(`${todos[index].text} が ${newTodoText} が更新`);
+      }
+    } else {
+      console.log('有効なインデックスを入力');
     }
   };
 
@@ -29,27 +52,28 @@ const TodoApp = () => {
   };
 
   const handleDeleteTodo = () => {
-    const index = parseInt(prompt('削除するToDoの番号を入力してください'), 10);
+    const index = parseInt(prompt('削除するToDoの番号を入力'), 10);
     if (!Number.isNaN(index) && index >= 0 && index < todos.length) {
       const deletedTodo = todos.splice(index, 1);
       setTodos([...todos]);
-      console.lxog(`${deletedTodo[0]}が削除されました`);
+      console.log(`${deletedTodo[0]}が削除`);
     } else {
-      console.log('有効なインデックスを入力してください');
+      console.log('有効なインデックスを入力');
     }
   };
 
   const handleCommandInput = () => {
-    let input = prompt('コマンドを入力してください(new, list, delete, quit)');
+    let input = prompt('コマンドを入力(new, list, edit,delete, quit)');
     while (
       input !== 'new' &&
+      input !== 'edit' &&
       input !== 'list' &&
       input !== 'delete' &&
       input !== 'quit' &&
       input !== 'q'
     ) {
-      console.log('コマンドが間違っています(new, list, delete, quit)');
-      input = prompt('コマンドを入力してください(new, list, delete, quit)');
+      console.log('コマンドが間違っています(new, list, edit ,delete, quit)');
+      input = prompt('コマンドを入力(new, list, edit , delete, quit)');
     }
     return input;
   };
@@ -58,6 +82,8 @@ const TodoApp = () => {
     const input = handleCommandInput();
     if (input === 'new') {
       handleNewTodo();
+    } else if (input === 'edit') {
+      handleEditTodo();
     } else if (input === 'list') {
       handleListTodos();
     } else if (input === 'delete') {
@@ -94,7 +120,7 @@ const TodoApp = () => {
         transition={{ duration: 0.5, delay: 0.2 }}
       >
         <button className='commandButton' onClick={handleCommand}>
-          コマンドを入力をしてください。
+          コマンドを入力してください。
         </button>
       </motion.div>
     </div>
