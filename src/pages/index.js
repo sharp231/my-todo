@@ -38,7 +38,7 @@ const TodoApp = () => {
         const newTodos = [...todos];
         newTodos[index] = newdatedTodo;
         setTodos(newTodos);
-        console.log(`${todos[index].text} が ${newTodoText} が更新`);
+        console.log(`${newTodoText} が更新`);
       }
     } else {
       console.log('有効なインデックスを入力');
