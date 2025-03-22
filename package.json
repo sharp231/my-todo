@@ -9,16 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "framer-motion": "^11.1.7",
-<<<<<<< HEAD
-    "next": "14.2.2",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
-=======
-    "next": "14.2.21",
-    "react": "^18",
-    "react-dom": "^18"
->>>>>>> 096a280cda5279efdc067311312c80fab103ff73
+    "framer-motion": "^11.1.7"
   },
   "devDependencies": {
     "eslint": "^8",
