@@ -16,7 +16,7 @@ body {
   justify-content: center;
   font-family: 'Poppins', sans-serif;
   background: #0d3b66;
-  background: -webkit-linear-gradient(to right, #0d6ebc, #0c57a3, #0d3b66);
+  background: -webkit-linear-gradient(right, #0d6ebc, #0c57a3, #0d3b66);
   background: linear-gradient(to right, #0d6ebc, #0c57a3, #0d3b66);
 }
 
@@ -49,46 +49,8 @@ h1 {
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex; /* フレックスボックスを有効化 */
   justify-content: space-between; /* 子要素を横方向に均等に配置 */
   align-items: flex-start; /* 子要素を上部に揃える */
-}
-
-.todoList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.todoItem {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 1rem;
-  background-color: white;
-  border-radius: 4px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  margin-bottom: 0.5rem;
-}
-
-.todoItem span {
-  color: black;
-}
-
-.container {
-  /* display: flex; */
-  justify-content: space-between;
-  align-items: flex-start;
-}
-
-.left-container {
-  width: 60%;
-  margin-right: 1rem; /* 左右の間隔を調整 */
-}
-
-.right-container {
-  width: 40%; /* または適切な値に変更 */
-  flex-shrink: 0; /* 要素の幅を維持 */
 }
 
 .button {
@@ -106,6 +68,38 @@ h1 {
   align-items: center;
   gap: 10px; /* 各要素の間隔を調整 */
 }
-.button:hover {
-  background-color: #0056b3;
+
+/* スマホ向けの調整 */
+@media (max-width: 640px) {
+  .container {
+    flex-direction: column; /* 縦方向に並べる */
+    padding: 1rem;
+  }
+
+  .left-container,
+  .right-container {
+    width: 100%; /* 幅を100%に */
+    margin-right: 0; /* マージンをリセット */
+  }
+
+  .todoItem {
+    flex-direction: column; /* タスクを縦方向に並べる */
+    align-items: flex-start; /* 左揃えにする */
+  }
+
+  .button {
+    width: auto; /* ボタンの幅を自動調整 */
+  }
+}
+
+/* タブレット向けの調整 */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .container {
+    flex-direction: row; /* 横方向に並べる */
+    padding: 1.5rem;
+  }
+  .todoItem {
+    flex-direction: row; /* タスクを横方向に並べる */
+    align-items: center; /* 中央揃えにする */
+  }
 }

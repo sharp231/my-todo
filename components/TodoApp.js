@@ -16,10 +16,13 @@ const TodoApp = () => {
   };
 
   return (
-    <div>
-      <h1>ToDoアプリ</h1>
-      <TodoForm addTodo={addTodo} />
-      <TodoList todos={todos} deleteTodo={deleteTodo} />
+    <div className="container mx-auto p-4 sm:p-6 lg:p-8 flex flex-col sm:flex-row gap-4">
+      <div className="left-container flex-1">
+        <TodoForm addTodo={addTodo} />
+      </div>
+      <div className="right-container flex-1">
+        <TodoList todos={todos} deleteTodo={deleteTodo} />
+      </div>
     </div>
   );
 };
