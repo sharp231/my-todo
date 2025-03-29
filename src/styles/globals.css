@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ベーススタイル */
 * {
   margin: 0;
   padding: 0;
@@ -20,6 +21,7 @@ body {
   background: linear-gradient(to right, #0d6ebc, #0c57a3, #0d3b66);
 }
 
+/* カードスタイル */
 .card {
   background-color: #fff;
   padding: 1.5rem 1.75rem;
@@ -35,6 +37,7 @@ body {
   }
 }
 
+/* 見出しスタイル */
 h1 {
   font-size: 3rem;
   text-align: center;
@@ -42,20 +45,23 @@ h1 {
   margin-bottom: 2rem;
 }
 
+/* コンテナスタイル */
 .container {
-  max-width: 600px;
+  /* max-width: 600px; */
   margin: 0 auto;
   padding: 1rem;
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  justify-content: space-between; /* 子要素を横方向に均等に配置 */
-  align-items: flex-start; /* 子要素を上部に揃える */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
+/* ボタンスタイル */
 .button {
   display: block;
-  width: 100%; /* ボタンの幅を100%に */
+  width: 100%;
   padding: 0.5rem 1rem;
   background-color: #2196f3;
   color: white;
@@ -63,26 +69,37 @@ h1 {
   border-radius: 4px;
   cursor: pointer;
 }
+
+/* フォームスタイル */
 .form-container {
   display: flex;
   align-items: center;
-  gap: 10px; /* 各要素の間隔を調整 */
+  gap: 10px;
+  width: 100%;
 }
 
-/* スマホ向けの調整 (小型デバイス) */
+/* スマホ向けの調整 */
 @media (max-width: 480px) {
   .container {
     flex-direction: column;
     padding: 0.5rem;
+    margin: 1rem; /* 外側の余白を追加 */
   }
 
   .button {
-    font-size: 0.8rem; /* ボタンのフォントサイズを小さく */
-    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem; /* ボタンのフォントサイズを小さく */
+    padding: 0.4rem 1rem;
   }
 
-  .todoItem {
-    font-size: 0.9rem; /* タスクのフォントサイズを調整 */
+  .form-container {
+    gap: 0.5rem; 
+    padding: 0.5rem;
+  }
+  
+  .form-container input,
+  .form-container select,
+  .form-container button {
+    width: 100%; 
   }
 }
 
@@ -97,9 +114,17 @@ h1 {
     font-size: 1rem;
     padding: 0.5rem 1rem;
   }
+  
+  .form-container {
+    flex-direction: row; /* 横方向に並べる */
+    /* gap: 1rem; */
+    padding: 1.5rem;
+  }
 
-  .todoItem {
-    font-size: 1rem;
+  .form-container input,
+  .form-container select,
+  .form-container button {
+    width: auto; 
   }
 }
 
@@ -114,10 +139,6 @@ h1 {
     font-size: 1.1rem;
     padding: 0.6rem 1.2rem;
   }
-
-  .todoItem {
-    font-size: 1.1rem;
-  }
 }
 
 /* デスクトップ向けの調整 (大型デバイス) */
@@ -131,9 +152,5 @@ h1 {
   .button {
     font-size: 1.2rem;
     padding: 0.8rem 1.5rem;
-  }
-
-  .todoItem {
-    font-size: 1.2rem;
   }
 }
