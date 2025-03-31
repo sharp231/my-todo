@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ベーススタイル */
 * {
   margin: 0;
   padding: 0;

@@ -1,18 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TodoForm from './TodoForm';
 import TodoList from './TodoList';
-
 
 const TodoApp = () => {
   const [todos, setTodos] = useState([]);
 
-  const addTodo = (text, date, priority) => {
-    const newTodo = { text, date, priority };
-    setTodos([...todos, newTodo]);
+  // APIからTodoリストを取得
+  useEffect(() => {
+    const fetchTodos = async () => {
+      try {
+        const response = await fetch('/api/todos'); // APIエンドポイントを呼び出す
+        const data = await response.json();
+        setTodos(data); // 取得したデータを状態にセット
+      } catch (error) {
+        console.error('Error fetching todos:', error);
+      }
+    };
+
+    fetchTodos();
+  }, []);
+
+  // 新しいTodoを追加
+  const addTodo = async (title) => {
+    try {
+      const response = await fetch('/api/todos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title }), // 新しいTodoを送信
+      });
+      const newTodo = await response.json();
+      setTodos([...todos, newTodo]); // 新しいTodoをリストに追加
+    } catch (error) {
+      console.error('Error adding todo:', error);
+    }
   };
 
-  const deleteTodo = (index) => {
-    setTodos(todos.filter((_, i) => i !== index));
+  // Todoを削除
+  const deleteTodo = async (index) => {
+    try {
+      const todoToDelete = todos[index];
+      await fetch(`/api/todos/${todoToDelete.id}`, {
+        method: 'DELETE',
+      });
+      setTodos(todos.filter((_, i) => i !== index)); // 削除後のリストを更新
+    } catch (error) {
+      console.error('Error deleting todo:', error);
+    }
   };
 
   return (
