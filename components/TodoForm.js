@@ -1,27 +1,22 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import DatePicker from 'react-datepicker';
-import ja from 'date-fns/locale/ja';
-import 'react-datepicker/dist/react-datepicker.css';
 
 const TodoForm = ({ addTodo }) => {
   const [text, setText] = useState('');
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [date, setDate] = useState('');
   const [priority, setPriority] = useState('medium');
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!text || !selectedDate || !priority) return;
-    
-    // ISO形式に変換してからTを境に分割
-    const formattedDate = selectedDate.toISOString().split('T')[0];
-    addTodo(text, formattedDate, priority);
+    if (!text || !date || !priority) return;
+    addTodo(text, date, priority);
     setText('');
-    setSelectedDate(new Date());
+    setDate(new Date().toISOString().split('T')[0]);
     setPriority('medium');
   };
 
-  const today = new Date();
+  const today = new Date().toISOString().split('T')[0];
   
   return (
     <motion.form
@@ -36,14 +31,11 @@ const TodoForm = ({ addTodo }) => {
         value={text}
         onChange={(e) => setText(e.target.value)}
       />
-      <DatePicker
-        selected={selectedDate}
-        onChange={(date) => setSelectedDate(date)}
-        minDate={today}
-        locale={ja}
-        dateFormat="yyyy年MM月dd日"
-        placeholderText="日付を選択"
-        className="date-picker"
+      <input
+        type="date"
+        value={date}
+        onChange={(e) => setDate(e.target.value)}
+        min={today}
       />
       <select value={priority} onChange={(e) => setPriority(e.target.value)}>
         <option value="low">低</option>
