@@ -1,51 +1,48 @@
-import pool from '../../lib/db';
+import { getTodos, addTodo, deleteTodo } from '../../lib/queries';
+import { handleError } from '../../utils/errorHandler';
+import { validateTodoInput, validateId } from '../../utils/validation';
 
 export default async function handler(req, res) {
+  res.setHeader('Allow', ['GET', 'POST', 'DELETE']);
+
   if (req.method === 'GET') {
-    // Todoリストを取得
     try {
-      const result = await pool.query('SELECT * FROM todos ORDER BY created_at DESC');
-      res.status(200).json(result.rows.map((todo) => ({
-        id: todo.id,
-        title: todo.title,
-        date: todo.date,
-        priority: todo.priority
-      }))
-      );
+      const todos = await getTodos();
+      res.status(200).json(todos);
     } catch (error) {
-      console.error('Error fetching todos:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      handleError(res, error, 'Error fetching todos');
     }
   } else if (req.method === 'POST') {
     const { title, date, priority } = req.body;
+
+    // バリデーション
+    const validationError = validateTodoInput(title, date, priority);
+    if (validationError) {
+      return res.status(400).json(validationError);
+    }
+
     try {
-      const result = await pool.query(
-        'INSERT INTO todos (title, date, priority) VALUES ($1, $2, $3) RETURNING *',
-        [title, date, priority]
-      );
-      const newTodo = result.rows[0];
-      res.status(201).json({
-        id: newTodo.id,
-        title: newTodo.title,
-        date: newTodo.date,
-        priority: newTodo.priority,
-      });
+      const newTodo = await addTodo(title, date, priority);
+      res.status(201).json(newTodo);
     } catch (error) {
-      console.error('Error adding todo:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      handleError(res, error, 'Error adding todo');
     }
   } else if (req.method === 'DELETE') {
-    // Todoを削除
     const { id } = req.query;
+
+    // バリデーション
+    const validationError = validateId(id);
+    if (validationError) {
+      return res.status(400).json(validationError);
+    }
+
     try {
-      await pool.query('DELETE FROM todos WHERE id = $1', [id]);
-      res.status(204).end(); // 成功時は204 No Contentを返す
+      await deleteTodo(id);
+      res.status(200).json({ message: 'Todo deleted successfully' });
     } catch (error) {
-      console.error('Error deleting todo:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      handleError(res, error, 'Error deleting todo');
     }
   } else {
-    res.setHeader('Allow', ['GET', 'POST', 'DELETE']);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
