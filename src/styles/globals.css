@@ -2,154 +2,198 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
+/* body のスタイルは Tailwind のクラスで代替可能 */
 body {
-  min-height: 100vh;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Poppins', sans-serif;
-  background: #0d3b66;
-  background: -webkit-linear-gradient(right, #0d6ebc, #0c57a3, #0d3b66);
-  background: linear-gradient(to right, #0d6ebc, #0c57a3, #0d3b66);
+  @apply min-h-screen w-full flex items-center justify-center font-sans bg-gradient-to-r from-blue-400 to-blue-800;
 }
 
 /* カードスタイル */
 .card {
-  background-color: #fff;
-  padding: 1.5rem 1.75rem;
-  cursor: pointer;
-  max-width: 300px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-@media (min-width: 480px) {
-  .card {
-    max-width: 480px;
-    padding: 2rem 2.5rem;
-  }
+  @apply bg-white p-4 md:p-6 cursor-pointer max-w-sm md:max-w-md shadow;
 }
 
 /* 見出しスタイル */
 h1 {
-  font-size: 3rem;
-  text-align: center;
-  color: black;
-  margin-bottom: 2rem;
+  @apply text-[3rem] text-center text-black mb-8; /* mb-4 を mb-8 に変更して間隔を調整 */
 }
 
 /* コンテナスタイル */
 .container {
-  /* max-width: 600px; */
-  margin: 0 auto;
-  padding: 1rem;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  @apply w-full max-w-2xl mx-auto p-4 bg-white rounded-md shadow flex flex-col items-center;
 }
 
 /* ボタンスタイル */
 .button {
-  display: block;
-  width: 100%;
-  padding: 0.5rem 1rem;
-  background-color: #2196f3;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  @apply inline-block px-4 py-2 bg-blue-500 text-white border-none rounded-md cursor-pointer mx-1;
+}
+
+.cancel-button {
+  @apply inline-block px-4 py-2 bg-red-500 text-white border-none rounded-md cursor-pointer mx-1;
 }
 
 /* フォームスタイル */
 .form-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
+  @apply flex items-center gap-2 w-full mb-4 flex-wrap;
+}
+
+.form-container input,
+.form-container select,
+.date-picker {
+  @apply p-2 border border-gray-300 rounded-md mr-2;
+}
+
+/* リストスタイル */
+ul {
+  @apply list-none w-full p-0;
+}
+
+li {
+  @apply flex items-center justify-between p-4 mb-2 bg-gray-100 rounded-md shadow-sm transition-all duration-300 ease-in-out flex-wrap;
+}
+
+li:hover {
+  @apply bg-gray-200 transform translate-y-[-2px];
+}
+
+li span {
+  @apply mr-4 flex-1;
 }
 
 /* スマホ向けの調整 */
 @media (max-width: 480px) {
   .container {
+    @apply p-2 mx-4;
     flex-direction: column;
-    padding: 0.5rem;
-    margin: 1rem; /* 外側の余白を追加 */
+    align-items: stretch;
   }
 
-  .button {
-    font-size: 0.9rem; /* ボタンのフォントサイズを小さく */
-    padding: 0.4rem 1rem;
+  .button,
+  .cancel-button {
+    @apply text-sm py-1 px-2 mt-2 w-auto;
   }
 
   .form-container {
-    gap: 0.5rem; 
-    padding: 0.5rem;
+    flex-direction: column;
+    gap: 1;
+    padding: 2;
+    align-items: stretch;
   }
-  
+
   .form-container input,
   .form-container select,
+  .date-picker,
   .form-container button {
-    width: 100%; 
+    @apply w-full mb-2;
+  }
+
+  li {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  li span {
+    @apply mb-2 w-full;
+  }
+
+  li button {
+    @apply w-full mt-2;
   }
 }
 
 /* タブレット向けの調整 (中型デバイス) */
 @media (min-width: 481px) and (max-width: 768px) {
   .container {
-    flex-direction: column;
-    padding: 1rem;
+    @apply p-4;
   }
 
-  .button {
-    font-size: 1rem;
-    padding: 0.5rem 1rem;
+  .button,
+  .cancel-button {
+    @apply py-2 px-4 text-base;
   }
-  
+
   .form-container {
-    flex-direction: row; /* 横方向に並べる */
-    /* gap: 1rem; */
-    padding: 1.5rem;
+    @apply flex-wrap p-4;
   }
 
   .form-container input,
   .form-container select,
-  .form-container button {
-    width: auto; 
+  .date-picker {
+    @apply flex-1 min-w-[120px];
+  }
+
+  li {
+    @apply flex-wrap;
   }
 }
 
 /* タブレット横向き向けの調整 */
 @media (min-width: 769px) and (max-width: 1024px) {
   .container {
-    flex-direction: row;
-    padding: 1.5rem;
+    @apply p-6;
   }
 
-  .button {
-    font-size: 1.1rem;
-    padding: 0.6rem 1.2rem;
+  .button,
+  .cancel-button {
+    @apply py-2.5 px-5 text-lg;
   }
 }
 
 /* デスクトップ向けの調整 (大型デバイス) */
 @media (min-width: 1025px) {
   .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
+    @apply max-w-3xl p-8;
   }
 
-  .button {
-    font-size: 1.2rem;
-    padding: 0.8rem 1.5rem;
+  .button,
+  .cancel-button {
+    @apply py-3 px-6 text-xl;
   }
+}
+
+/* EditTodoForm のコンテナ */
+.edit-todo-form {
+  @apply flex items-center gap-2 w-full flex-wrap;
+}
+
+/* 各入力要素 */
+.edit-todo-form > div {
+  @apply flex flex-col flex-1 min-w-[150px];
+}
+
+.edit-todo-form input.form-container,
+.edit-todo-form .react-datepicker-wrapper,
+.edit-todo-form select.form-container {
+  @apply p-2 rounded-md w-full;
+  border: none; /* Tailwind の border クラスを使用する場合は削除 */
+}
+
+.edit-todo-form label {
+  @apply mb-1;
+}
+
+/* ボタンのコンテナ */
+.edit-todo-form > div:last-child {
+  @apply flex justify-end w-full gap-2;
+}
+
+/* ボタン */
+.edit-todo-form .button,
+.edit-todo-form .cancel-button {
+  /* 既存のボタンスタイルは Tailwind の button クラスで代替可能 */
+}
+
+/* DatePicker の幅調整 */
+.edit-todo-form > div:nth-child(2) {
+  flex-basis: auto;
+  min-width: auto; /* 必要に応じて調整 */
+  flex-grow: 0;
+}
+
+.edit-todo-form .react-datepicker-wrapper {
+  width: auto;
+}
+
+.edit-todo-form select.form-container {
+  width: auto;
+  min-width: 80px; /* 優先度の幅 */
 }

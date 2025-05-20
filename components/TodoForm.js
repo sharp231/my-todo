@@ -13,9 +13,16 @@ const TodoForm = ({ addTodo }) => {
     e.preventDefault();
     if (!text || !selectedDate || !priority) return;
 
-    // ISO形式に変換してからTを境に分割
-    const formattedDate = selectedDate.toISOString().split('T')[0];
+    // 日付をISO形式に変換してからTを境に分割
+    // ローカルタイムゾーンで日付をフォーマット
+  const formattedDate = selectedDate.toLocaleDateString('ja-JP', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).replace(/\//g, '-'); // "
     addTodo(text, formattedDate, priority);
+
+    // フォームをリセット
     setText('');
     setSelectedDate(new Date());
     setPriority('medium');
@@ -29,12 +36,14 @@ const TodoForm = ({ addTodo }) => {
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
-      className='form-container'>
+      className="form-container"
+    >
       <input
         type="text"
         placeholder="ToDoを入力"
         value={text}
         onChange={(e) => setText(e.target.value)}
+        className="text-input"
       />
       <DatePicker
         selected={selectedDate}
@@ -45,17 +54,22 @@ const TodoForm = ({ addTodo }) => {
         placeholderText="日付を選択"
         className="date-picker"
       />
-      <select value={priority} onChange={(e) => setPriority(e.target.value)}>
+      <select
+        value={priority}
+        onChange={(e) => setPriority(e.target.value)}
+        className="priority-select"
+      >
         <option value="low">低</option>
         <option value="medium">中</option>
         <option value="high">高</option>
       </select>
       <motion.button
         type="submit"
-        className='button'
+        className="button"
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}>
+        transition={{ duration: 0.5, delay: 0.2 }}
+      >
         追加
       </motion.button>
     </motion.form>

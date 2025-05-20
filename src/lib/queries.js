@@ -2,7 +2,7 @@ import pool from './db';
 
 // Todoリストを取得
 export const getTodos = async () => {
-  const result = await pool.query('SELECT * FROM todos ORDER BY created_at DESC');
+  const result = await pool.query('SELECT * from todos ORDER BY created_at DESC');
   return result.rows;
 };
 
@@ -17,5 +17,36 @@ export const addTodo = async (title, date, priority) => {
 
 // Todoを削除
 export const deleteTodo = async (id) => {
-  await pool.query('DELETE FROM todos WHERE id = $1', [id]);
+  const query = 'DELETE FROM todos WHERE id = $1';
+  const values = [id];
+
+  const result = await pool.query(query, values);
+  return result.rowCount; // 削除された行数を返す
+};
+
+// Todoを更新
+export const updateTodo = async (id, fields) => {
+  const updates = [];
+  const values = [];
+  let index = 1;
+
+  // 更新するフィールドを動的に構築
+  for (const [key, value] of Object.entries(fields)) {
+    if (value !== undefined && value !== null) {
+      updates.push(`${key} = $${index}`);
+      values.push(value);
+      index++;
+    }
+  }
+  // 更新するフィールドがない場合はエラーをスロー
+  if (updates.length === 0) {
+    throw new Error('No fields to update');
+  }
+
+  // IDを最後に追加
+  values.push(id);
+  const query = `UPDATE todos SET ${updates.join(', ')} WHERE id = $${index} RETURNING *`;
+
+  const result = await pool.query(query, values);
+  return result.rows[0]; // 更新後のTodoを返す
 };

@@ -28,16 +28,16 @@ const TodoApp = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, date, priority }), // 送信するデータをJSON形式に変換
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to add todo');
       }
-  
+
       const newTodo = await response.json();
-  
+
       // レスポンスデータを確認
       console.log('New Todo Response:', newTodo);
-  
+
       // 新しいTodoをリストに追加
       setTodos((prevTodos) => [...prevTodos, newTodo]);
     } catch (error) {
@@ -61,6 +61,31 @@ const TodoApp = () => {
       console.error('Error deleting todo:', error);
     }
   };
+  // Todoを更新
+  const updateTodo = async (id, updatedFields) => {
+    try {
+      const response = await fetch('/api/todos', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json; charset=utf-8' },
+        body: JSON.stringify({ id, ...updatedFields }), // 更新データを送信
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update todo');
+      }
+
+      const updatedTodo = await response.json();
+
+      // 更新されたTodoをリストに反映
+      setTodos((prevTodos) =>
+        prevTodos.map((todo) =>
+          todo.id === id ? { ...todo, ...updatedTodo } : todo
+        )
+      );
+    } catch (error) {
+      console.error('Error updating todo:', error);
+    }
+  };
 
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8 flex flex-col sm:flex-row gap-4">
@@ -68,7 +93,7 @@ const TodoApp = () => {
         <TodoForm addTodo={addTodo} />
       </div>
       <div className="right-container flex-1">
-        <TodoList todos={todos} deleteTodo={deleteTodo} />
+        <TodoList todos={todos} deleteTodo={deleteTodo} updateTodo={updateTodo} />
       </div>
     </div>
   );

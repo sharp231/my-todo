@@ -1,9 +1,9 @@
-import { getTodos, addTodo, deleteTodo } from '../../lib/queries';
+import { getTodos, addTodo, deleteTodo, updateTodo } from '../../lib/queries';
 import { handleError } from '../../utils/errorHandler';
-import { validateTodoInput, validateId } from '../../utils/validation';
+import { validateTodoInput, validateId, validateUpdateTodoInput } from '../../utils/validation';
 
 export default async function handler(req, res) {
-  res.setHeader('Allow', ['GET', 'POST', 'DELETE']);
+  res.setHeader('Allow', ['GET', 'POST', 'DELETE', 'PUT' , 'PATCH']);
 
   if (req.method === 'GET') {
     try {
@@ -41,6 +41,22 @@ export default async function handler(req, res) {
       res.status(200).json({ message: 'Todo deleted successfully' });
     } catch (error) {
       handleError(res, error, 'Error deleting todo');
+
+    }
+  } else if (req.method === 'PUT' || req.method === 'PATCH') {
+    const { id, title, date, priority } = req.body;
+
+    // バリデーション
+    const validationError = validateUpdateTodoInput(id, title, date, priority);
+    if (validationError) {
+      return res.status(400).json(validationError);
+    }
+
+    try {
+      const updatedTodo = await updateTodo(id, { title, date, priority });
+      res.status(200).json(updatedTodo); // 更新後のデータを返す
+    } catch (error) {
+      handleError(res, error, 'Error updating todo');
     }
   } else {
     res.status(405).end(`Method ${req.method} Not Allowed`);
