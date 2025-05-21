@@ -1,5 +1,5 @@
 // import React, { useState } from 'react';
-import TodoApp from '../../components/todoApp';
+import TodoApp from '../../components/TodoApp';
 
 const Home = () => {
   return (
