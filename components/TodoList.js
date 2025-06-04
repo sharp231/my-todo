@@ -18,7 +18,7 @@ const formatDate = (dateString) => {
   }
 };
 
-const TodoList = ({ todos, deleteTodo, updateTodo }) => {
+const TodoList = ({ todos, deleteTodo, updateTodo, replaceTodo }) => {
   const [editingTodoId, setEditingTodoId] = useState(null); // 編集中のTodo IDを管理
 
   const handleEditClick = (id) => {
@@ -38,7 +38,11 @@ const TodoList = ({ todos, deleteTodo, updateTodo }) => {
               todo={{ ...todo, date: todo.date ? new Date(todo.date) : null }} // Date型に変換
               // 編集対象のTodoを渡す
               onUpdate={(id, updatedFields) => {
-                updateTodo(id, updatedFields); // 更新処理を呼び出し
+                updateTodo(id, updatedFields); // 部分更新（PATCH）
+                setEditingTodoId(null); // 編集状態を解除
+              }}
+              onReplace={(id, todoData) => {
+                replaceTodo(id, todoData); // 完全更新（PUT）
                 setEditingTodoId(null); // 編集状態を解除
               }}
               onCancel={handleCancelEdit}

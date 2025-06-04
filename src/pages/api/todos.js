@@ -1,9 +1,9 @@
 import { getTodos, addTodo, deleteTodo, updateTodo } from '../../lib/queries';
 import { handleError } from '../../utils/errorHandler';
-import { validateTodoInput, validateId, validateUpdateTodoInput } from '../../utils/validation';
+import { validateTodoInput, validateCompleteTodoInput, validateId } from '../../utils/validation';
 
 export default async function handler(req, res) {
-  res.setHeader('Allow', ['GET', 'POST', 'DELETE', 'PUT' , 'PATCH']);
+  res.setHeader('Allow', ['GET', 'POST', 'DELETE', 'PUT', 'PATCH']);
 
   if (req.method === 'GET') {
     try {
@@ -43,22 +43,49 @@ export default async function handler(req, res) {
       handleError(res, error, 'Error deleting todo');
 
     }
-  } else if (req.method === 'PUT' || req.method === 'PATCH') {
+  } else if (req.method === 'PUT') {
+    // ■ 完全置換(PUT) ■
+    // body: { id, title, date, priority }
     const { id, title, date, priority } = req.body;
-
-    // バリデーション
-    const validationError = validateUpdateTodoInput(id, title, date, priority);
-    if (validationError) {
-      return res.status(400).json(validationError);
+    if (!id) {
+      return res.status(400).json({ error: 'ID is required' });
     }
+    const err = validateCompleteTodoInput({ title, date, priority });
+    if (err) return res.status(400).json(err);
 
     try {
       const updatedTodo = await updateTodo(id, { title, date, priority });
+      if (!updatedTodo) {
+        return res.status(404).json({ error: 'Todo not found' });
+      }
+      return res.status(200).json({
+        message: 'Todo completely replaced',
+        method: 'PUT',
+        todo: updatedTodo
+      });
+    } catch (error) {
+      handleError(res, error, 'Error replacing todo');
+    }
+
+  } else if (req.method === 'PATCH') {
+    // ■ 部分更新(PATCH) ■
+    // body: { id, [title], [date], [priority] } ※[ ]は任意
+    const { id, title, date, priority } = req.body;
+    if (!id) {
+      return res.status(400).json({ error: 'ID is required' });
+    }
+    try {
+      const updatedTodo = await updateTodo(id, { title, date, priority });
+      if (!updatedTodo) {
+        return res.status(404).json({ error: 'Todo not found' });
+      }
       res.status(200).json(updatedTodo); // 更新後のデータを返す
     } catch (error) {
-      handleError(res, error, 'Error updating todo');
+      console.error('Error updating todo:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
   } else {
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
+
