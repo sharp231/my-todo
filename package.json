@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "cross-env NODE_ENV=test vitest run",
-    "test:setup":  "cross-env NODE_ENV=test node -r dotenv/config scripts/setup-test-db.js dotenv_config_path=.env.test",
+    "test:setup": "cross-env NODE_ENV=test node -r dotenv/config scripts/setup-test-db.js dotenv_config_path=.env.test",
     "test:cleanup": "cross-env NODE_ENV=test node -r dotenv/config scripts/cleanup-test-db.js dotenv_config_path=.env.test"
   },
   "dependencies": {
