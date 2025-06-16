@@ -35,3 +35,22 @@ export const validateUpdateTodoInput = (id, title, date, priority) => {
   }
   return null; // バリデーション成功
 };
+
+export const validateCompleteTodoInput = ({ title, date, priority }) => {
+  // titleは必須かつ文字列
+  if (!title || typeof title !== 'string') {
+    return { error: 'Invalid or missing "title"' };
+  }
+
+  // dateは必須かつ有効な日付文字列
+  if (!date || isNaN(Date.parse(date))) {
+    return { error: 'Invalid or missing "date" format' };
+  }
+
+  // priorityは必須かつ "low" | "medium" | "high"
+  if (!priority || !['low', 'medium', 'high'].includes(priority)) {
+    return { error: 'Invalid or missing "priority" value' };
+  }
+
+  return null; // バリデーション成功
+};
