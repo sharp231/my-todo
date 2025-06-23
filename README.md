@@ -39,71 +39,68 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
-
-
 # 📋 Todo アプリ
 
-Next.js・React・TailwindCSS・Neon・Vercel などのモダンな技術を用いた、タスク管理アプリです。RESTful API による CRUD 操作、CI/CD、ユニットテスト、自動デプロイなど、フルスタック開発のベストプラクティスを取り入れています。
-
+Next.js・React・TailwindCSS・Neon・Vercel などのモダン技術を用いたタスク管理アプリです。RESTful API による CRUD 操作、CI/CD（GitHub Actions / Vercel）、ユニットテスト、自動デプロイなど、フルスタック開発のベストプラクティスを取り入れています。
 ---
 
 ## 🚀 技術スタック
 
-| 分類       | 技術構成                                       |
-| -------- | ------------------------------------------ |
-| フロントエンド  | Next.js / React / TailwindCSS              |
-| バックエンド   | Next.js API Routes（REST API）, Prisma（導入予定） |
-| データベース   | Neon（サーバーレス PostgreSQL）                    |
-| テスト      | Thunder Client（API テスト） / Vitest（ユニットテスト）  |
-| デプロイ     | Vercel（CI/CD 自動デプロイ）                       |
-| パッケージ管理  | Yarn                                       |
-| 実行環境（予定） | Docker / Docker Compose（開発・本番共通化）          |
-
+| 分類      | 技術構成                                         |
+| ------- | -------------------------------------------- |
+| フロントエンド | Next.js / React / TailwindCSS                |
+| バックエンド  | Next.js API Routes（REST API），Prisma（導入予定）    |
+| データベース  | Neon（サーバーレス PostgreSQL）                      |
+| テスト     | Thunder Client（API テスト） / Vitest（ユニットテスト）    |
+| CI/CD   | GitHub Actions（`.github/workflows`） / Vercel |
+| コンテナ    | Docker（導入予定）                                 |
+| デプロイ    | Vercel（自動デプロイ）                               |
+| パッケージ管理 | Yarn                                         |
 ---
 
 ## ✅ 機能概要
 
-* タスクの作成 / 編集 / 削除
-* ステータス切り替え（完了 / 未完了）
+* タスクの作成・編集・削除
+* 完了／未完了ステータス切替
 * REST API による CRUD（GET / POST / PUT / PATCH / DELETE）
 * Neon によるデータ永続化（Prisma 導入予定）
 * TailwindCSS によるレスポンシブ対応
 * Thunder Client による API テスト
 * Vitest によるユニットテストと自動化
-
-
+* GitHub Actions ワークフローによる CI（ビルド・テスト）
+---
 ## 🧠 アーキテクチャ
 
 ```bash
 /
-├── pages/              # Next.js ページ・APIルート
+├── .github/
+│   └── workflows/      # GitHub Actions ワークフロー定義
+├── pages/              # Next.js ページ・API Routes
 │   └── api/            # REST API (CRUD)
 ├── components/         # UI コンポーネント
 ├── lib/                # DB 接続・共通バリデーション
 ├── prisma/             # Prisma スキーマ（導入予定）
 ├── styles/             # Tailwind 設定・グローバルスタイル
-├── tests/              # Vitest によるテスト群
-└── docker/             # Dockerfile や docker-compose.yml（導入予定）
+└── tests/              # Vitest によるテスト群
 ```
 
-* Next.js API Routes にて CRUD 実装
-* Neon と Prisma（予定）による DB 永続化
-* バリデーションは共通関数にて管理
+* Next.js API Routes で CRUD 実装
+* Neon と Prisma（予定）で DB 永続化
+* 共通バリデーション関数でデータ整合性を確保
 * TailwindCSS による高速な UI 構築
-* Vercel による CI/CD 自動デプロイ
-* Docker による開発・運用環境の統一（予定）
+* GitHub Actions & Vercel で CI/CD 自動化
+---
 
 ## 🧩 技術的工夫
 
-* **モジュール構成**：機能単位でディレクトリを分割し、保守性と拡張性を向上
-* **バリデーション共通化**：データ整合性と再利用性を確保
+* **モジュール構成**：機能単位でディレクトリを整理し、保守性・拡張性を向上
+* **バリデーション共通化**：再利用性とデータ整合性を確保
 * **品質管理**：
-  * Thunder Client による API の正常・異常ケースのテスト
+  * Thunder Client による API の正常・異常ケーステスト
   * Vitest によるユニットテストでロジックを検証
-* **レスポンシブ対応**：全デバイスで快適な操作性を提供
-* **CI/CD**：Vercel による自動ビルド・デプロイ
-* **Docker（予定）**：開発・本番で一貫した環境の再現性を目指す
-
+* **レスポンシブ対応**：全デバイスで快適な UI/UX
+* **CI/CD**：GitHub Actions でビルド・テストを自動実行 → Vercel へデプロイ
+---
 
 ## 🛠 セットアップ方法
 
@@ -111,35 +108,35 @@ Next.js・React・TailwindCSS・Neon・Vercel などのモダンな技術を用�
 git clone https://github.com/あなた/your-todo-app.git
 cd your-todo-app
 
-# 環境変数ファイルを作成
+# 環境変数
 cp .env.test .env.local
 # .env.local に DATABASE_URL (Neon) を設定
 
-# パッケージインストール
+# 依存関係インストール
 yarn install
 
 # 開発サーバー起動
 yarn dev
 ```
-
 ## 🔬 テスト方法
 
-* **API テスト**：Thunder Client による正常系・異常系の確認
-* **ユニットテスト**：Vitest によるロジックとバリデーションの自動テスト
-
+* **CI (GitHub Actions)**：Push／Pull Request 時にビルド＆テストを自動実行
+* **API テスト**：Thunder Client で正常系・異常系を確認
+* **ユニットテスト**：Vitest でバリデーション・ロジックを検証
+---
 
 ## 🎯 開発背景
 
-このアプリは、個人のポートフォリオおよびフルスタック開発練習の一環として構築されました。UI/UX、保守性、バリデーションなどに配慮のコードベースを目指しています。
-
+個人のポートフォリオおよびフルスタック開発の学習用プロジェクトとして構築。
+UI/UX、保守性、テスト、自動化の全工程を通じてバリデーションなどに配慮の良いコードベースを目指しています。
+---
 ## 🔮 今後の拡張予定
 
-* Prisma の導入とスキーマ定義（Neon 連携）
-* ユーザー認証機能（NextAuth.js / Clerk）
+* Prisma の導入とスキーマ定義
+* Docker コンテナ化による一貫した開発環境
+* ユーザー認証（NextAuth.js または Clerk）
 * タグ・カテゴリによるタスク分類機能
-* タスク期限通知（メールやSNS連携）
-* Docker による環境構築（開発・ステージング・本番の統一）
+* 通知機能（期限アラート／メール連携）
 
 ## 🔗 公開URL
-
-👉 [デプロイ済アプリを見る](https://my-todo-9h6e.vercel.app/)
+👉 [アプリを見る](https://my-todo-9h6e.vercel.app/)
