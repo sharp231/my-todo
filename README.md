@@ -93,13 +93,11 @@ Next.js・React・TailwindCSS・Neon・Vercel などのモダンな技術を用�
 * Vercel による CI/CD 自動デプロイ
 * Docker による開発・運用環境の統一（予定）
 
-
 ## 🧩 技術的工夫
 
 * **モジュール構成**：機能単位でディレクトリを分割し、保守性と拡張性を向上
 * **バリデーション共通化**：データ整合性と再利用性を確保
 * **品質管理**：
-
   * Thunder Client による API の正常・異常ケースのテスト
   * Vitest によるユニットテストでロジックを検証
 * **レスポンシブ対応**：全デバイスで快適な操作性を提供
@@ -114,7 +112,7 @@ git clone https://github.com/あなた/your-todo-app.git
 cd your-todo-app
 
 # 環境変数ファイルを作成
-cp .env.example .env.local
+cp .env.test .env.local
 # .env.local に DATABASE_URL (Neon) を設定
 
 # パッケージインストール
@@ -124,7 +122,6 @@ yarn install
 yarn dev
 ```
 
-
 ## 🔬 テスト方法
 
 * **API テスト**：Thunder Client による正常系・異常系の確認
@@ -133,7 +130,7 @@ yarn dev
 
 ## 🎯 開発背景
 
-このアプリは、個人のポートフォリオおよびフルスタック開発練習の一環として構築されました。UI/UX、保守性、バリデーションなどに配慮し、誰が見ても読みやすく・使いやすく・拡張しやすいコードベースを目指しています。
+このアプリは、個人のポートフォリオおよびフルスタック開発練習の一環として構築されました。UI/UX、保守性、バリデーションなどに配慮のコードベースを目指しています。
 
 ## 🔮 今後の拡張予定
 
@@ -146,4 +143,3 @@ yarn dev
 ## 🔗 公開URL
 
 👉 [デプロイ済アプリを見る](https://my-todo-9h6e.vercel.app/)
-
