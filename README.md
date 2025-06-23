@@ -42,7 +42,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 # 📋 Todo アプリ
 
 Next.js・React・TailwindCSS・Neon・Vercel などのモダン技術を用いたタスク管理アプリです。RESTful API による CRUD 操作、CI/CD（GitHub Actions / Vercel）、ユニットテスト、自動デプロイなど、フルスタック開発のベストプラクティスを取り入れています。
----
+
 
 ## 🚀 技術スタック
 
