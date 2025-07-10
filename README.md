@@ -87,7 +87,7 @@ Next.js・React・TailwindCSS・Neon・Vercel などのモダン技術を用い�
 * Next.js API Routes で CRUD 実装
 * Neon と Prisma（予定）で DB 永続化
 * 共通バリデーション関数でデータ整合性を確保
-* TailwindCSS による高速な UI 構築
+* TailwindCSSによる高速な UI 構築
 * GitHub Actions & Vercel で CI/CD 自動化
 ---
 
@@ -96,8 +96,8 @@ Next.js・React・TailwindCSS・Neon・Vercel などのモダン技術を用い�
 * **モジュール構成**：機能単位でディレクトリを整理し、保守性・拡張性を向上
 * **バリデーション共通化**：再利用性とデータ整合性を確保
 * **品質管理**：
-  * Thunder Client による API の正常・異常ケーステスト
-  * Vitest によるユニットテストでロジックを検証
+  * Thunder Clientによる API の正常・異常ケーステスト
+  * Vitestによるユニットテストでロジックを検証
 * **レスポンシブ対応**：全デバイスで快適な UI/UX
 * **CI/CD**：GitHub Actions でビルド・テストを自動実行 → Vercel へデプロイ
 ---
@@ -132,11 +132,12 @@ yarn dev
 
 ## 🔮 今後の拡張予定
 
-* Prisma の導入とスキーマ定義
+* Prismaの導入とスキーマ定義
 * Docker コンテナ化による一貫した開発環境
 * ユーザー認証（NextAuth.js または Clerk）
 * タグ・カテゴリによるタスク分類機能
 * 通知機能（期限アラート／メール連携）
+* Firebaseの導入
 
 ## 🔗 公開URL
 👉 [アプリを見る](https://my-todo-9h6e.vercel.app/)
