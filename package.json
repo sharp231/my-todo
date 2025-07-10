@@ -12,6 +12,7 @@
     "test:cleanup": "cross-env NODE_ENV=test node -r dotenv/config scripts/cleanup-test-db.js dotenv_config_path=.env.test"
   },
   "dependencies": {
+    "@clerk/backend": "2.4.1",
     "@clerk/nextjs": "^6.20.2",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
