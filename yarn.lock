@@ -42,7 +42,6 @@
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.27.6.tgz#ec4070a04d76bae8ddbb10770ba55714a417b7c6"
   integrity sha512-vbavdySgbTTrmFE+EsiqUTzlOr5bzlnJtUv9PynGCAKvfQqjIXbvFdumPM/GxMDfyuGMJaJAU6TO4zc1Jf1i8Q==
 
-<<<<<<< HEAD
 "@clerk/backend@2.4.1":
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/@clerk/backend/-/backend-2.4.1.tgz#7c736c16ad15ef444e75ebfe899026397d8da518"
@@ -59,12 +58,6 @@
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@clerk/backend/-/backend-2.0.0.tgz#6e12dca8f295d6154c0866ea67236f408e82b7a9"
   integrity sha512-1P4o9L464KVYjkMPaFBKmWo0WpUZsSO+57xjkrKPjW0FOTylYRicKCafoixfRlPMlYWzx7ETmj0ZypmrAZniBA==
-=======
-"@clerk/backend@^2.4.0":
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/@clerk/backend/-/backend-2.4.1.tgz#7c736c16ad15ef444e75ebfe899026397d8da518"
-  integrity sha512-NryqYBslAWMNkw/8ff6qK9kMrbWPIAtNOfkr62Rmtyh/MODRQJI0GmHgLg0DcBQofPrRCIXhauhfJRWqweN3Mw==
->>>>>>> a657161f80493da57c3c08de8b427b5564b97be1
   dependencies:
     "@clerk/shared" "^3.11.0"
     "@clerk/types" "^4.64.0"
