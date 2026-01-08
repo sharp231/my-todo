@@ -21,17 +21,33 @@ Task Managerです。
 ---
 
 ## 技術スタック
-- Next.js（Pages Router / API Routes）
-- JavaScript
-- TailwindCSS
-- Neon（PostgreSQL）
-- Thunder Client（APIテスト）
-- Vitest（ユニットテスト）
-- GitHub Actions（CI）
-- Vercel（デプロイ）
+| 分類      | 技術構成                                         |
+| ------- | -------------------------------------------- |
+| フロントエンド | Next.js / React / TailwindCSS                |
+| バックエンド  | Next.js API Routes（REST API），Prisma（導入予定）    |
+| データベース  | Neon（サーバーレス PostgreSQL）                      |
+| テスト     | Thunder Client（API テスト） / Vitest（ユニットテスト）    |
+| CI/CD   | GitHub Actions（`.github/workflows`） / Vercel |
+| コンテナ    | Docker（導入予定）                                 |
+| デプロイ    | Vercel（自動デプロイ）                               |
+| パッケージ管理 | Yarn                                         |
 
 ---
 
+### 🧠 アーキテクチャ
+
+```bash
+/
+├── .github/
+│   └── workflows/      # GitHub Actions ワークフロー定義
+├── pages/              # Next.js ページ・API Routes
+│   └── api/            # REST API (CRUD)
+├── components/         # UI コンポーネント
+├── lib/                # DB 接続・共通バリデーション
+├── prisma/             # Prisma スキーマ（導入予定）
+├── styles/             # Tailwind 設定・グローバルスタイル
+└── tests/              # Vitest によるテスト群
+```
 ## ディレクトリ構成
 - `src/pages`：画面（Pages Router）
 - `src/pages/api`：API Routes（CRUD）
@@ -171,7 +187,6 @@ yarn test
 
 * Vercel にデプロイ（GitHub連携）
 * `DATABASE_URL` は Vercel 側の環境変数にも設定してください
-
 ---
 
 ## 今後の拡張予定
