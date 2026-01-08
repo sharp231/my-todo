@@ -109,7 +109,6 @@ API Routes 内に処理が集中すると、責務混在・重複実装・修正
 - 一貫性：クライアント側の実装が単純化（分岐が増えにくい）
 - 保守性：原因追跡がしやすい
 - セキュリティ：内部情報の過剰な露出を避けやすい
-
 ---
 
 ### 4) DB接続の共通化（環境差の吸収）
@@ -135,7 +134,7 @@ API Routes 内に処理が集中すると、責務混在・重複実装・修正
 ### 1) 依存関係のインストール
 ```bash
 yarn install
-
+```
 ### 2) 環境変数（Neon）
 
 プロジェクトルートに `.env.local` を作成し、`DATABASE_URL` を設定してください。
@@ -143,9 +142,6 @@ yarn install
 ```env
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DBNAME?sslmode=require"
 ```
-
-> 補足（README改善案）
-> `.env.example`（サンプル）をリポジトリに置くと、初見の人が迷いにくくなります。
 
 ### 3) 開発サーバー起動
 
