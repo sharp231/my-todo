@@ -1,4 +1,3 @@
-````md
 # Task Manager（Next.js / API Routes / Neon）
 
 Task Managerです。  
