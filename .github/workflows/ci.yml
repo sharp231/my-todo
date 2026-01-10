@@ -1,0 +1,37 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build CI image (Dockerfile target=ci)
+        run: |
+          docker build --target ci -t app-ci:local .
+
+      - name: Run tests inside container
+        # DB を使うテストがまだ無ければ env は無しでOK
+        # env:
+        #   DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          docker run --rm app-ci:local
+
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build production image (target=runner)
+        run: |
+          docker build --target runner -t app-prod:local .
