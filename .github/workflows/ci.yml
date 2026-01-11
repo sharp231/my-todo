@@ -19,10 +19,10 @@ jobs:
 
       - name: Run tests inside container
         # DB を使うテストがまだ無ければ env は無しでOK
-        # env:
-        #   DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        env:
+          DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
         run: |
-          docker run --rm app-ci:local
+          docker run --rm　-e TEST_DATABASE_URL=$TEST_DATABASE_URL app-ci:local
 
   build:
     runs-on: ubuntu-latest
