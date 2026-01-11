@@ -4,8 +4,8 @@ FROM node:20-alpine AS base
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# corepack を有効化（yarn を安定利用）
-RUN corepack enable
+# yarn を安定利用（yarn classic固定。corepackの毎回DLを抑える）
+RUN corepack enable && corepack prepare yarn@1.22.22 --activate
 
 # 依存関係のインストール
 FROM base AS deps
@@ -16,7 +16,7 @@ RUN --mount=type=cache,target=/root/.cache/yarn\
 # 開発用（ホットリロード）
 FROM base AS dev
 ENV NODE_ENV=development
-RUN corepack prepare yarn@stable --activate
+# RUN corepack prepare yarn@stable --activate
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 EXPOSE 3000
