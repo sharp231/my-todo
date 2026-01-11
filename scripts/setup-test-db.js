@@ -1,4 +1,15 @@
 // scripts/setup-test-db.js
+const path = require('path');
+const dotenv = require('dotenv');
+
+const envPath = path.resolve(__dirname, '../.env.test'); // scripts/ の1つ上がプロジェクトルート想定
+const result = dotenv.config({ path: envPath });
+
+if (result.error) {
+  console.error(`❌ dotenv failed to load: ${envPath}`, result.error);
+  process.exit(1);
+}
+
 const { validateEnv, createPool, executeTransaction } = require('./db-utils');
 require('dotenv').config({ path: '.env.test' });
 
@@ -6,7 +17,7 @@ async function setupTestDatabase() {
   validateEnv();
   const pool = createPool();
   const client = await pool.connect();
-  
+
   try {
     await executeTransaction(client, async () => {
       console.log('📝 テスト用テーブルを作成中...');
