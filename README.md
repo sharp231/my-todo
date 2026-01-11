@@ -12,6 +12,7 @@ Task Manager です。
 - REST API による CRUD（GET / POST / PUT / PATCH / DELETE）
 - Neon によるデータ永続化（Prisma 導入予定）
 - TailwindCSS によるレスポンシブ対応
+- Docker コンテナによる開発環境・CI 環境の統一
 - Thunder Client による API テスト（正常系・異常系）
 - Vitest によるユニットテスト
 - GitHub Actions による CI（ビルド・テスト）
@@ -20,16 +21,16 @@ Task Manager です。
 
 ## 技術スタック
 
-| 分類           | 技術構成                                                |
-| -------------- | ------------------------------------------------------- |
-| フロントエンド | Next.js / React / TailwindCSS                           |
-| バックエンド   | Next.js API Routes（REST API），Prisma（導入予定）      |
-| データベース   | Neon（サーバーレス PostgreSQL）                         |
-| テスト         | Thunder Client（API テスト） / Vitest（ユニットテスト） |
-| CI/CD          | GitHub Actions（`.github/workflows`） / Vercel          |
-| コンテナ       | Docker（導入予定）                                      |
-| デプロイ       | Vercel（自動デプロイ）                                  |
-| パッケージ管理 | Yarn                                                    |
+| 分類               | 技術構成                                                |
+| ------------------ | ------------------------------------------------------- |
+| フロントエンド     | Next.js / React / TailwindCSS                           |
+| バックエンド       | Next.js API Routes（REST API）                          |
+| データベース       | Neon（サーバーレス PostgreSQL）                         |
+| テスト             | Thunder Client（API テスト） / Vitest（ユニットテスト） |
+| CI/CD              | GitHub Actions（`.github/workflows`） / Vercel          |
+| インフラ・コンテナ | Docker / Docker Compose                                 |
+| デプロイ           | Vercel（自動デプロイ）                                  |
+| パッケージ管理     | Yarn                                                    |
 
 ---
 
@@ -43,9 +44,10 @@ Task Manager です。
 │   └── api/            # REST API (CRUD)
 ├── components/         # UI コンポーネント
 ├── lib/                # DB 接続・共通バリデーション
-├── prisma/             # Prisma スキーマ（導入予定）
 ├── styles/             # Tailwind 設定・グローバルスタイル
-└── tests/              # Vitest によるテスト群
+├── tests/              # Vitest によるテスト群
+├── Dockerfile          # マルチステージビルド定義 (New)
+└── docker-compose.yml  # ローカル開発環境定義 (New)
 ```
 
 ## ディレクトリ構成
@@ -161,7 +163,19 @@ yarn install
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DBNAME?sslmode=require"
 ```
 
-### 3) 開発サーバー起動
+### 3) Docker で実行
+
+Docker および Docker Compose がインストールされている必要があります
+
+```bash
+# 開発サーバー起動（ホットリロード有効）
+docker-compose up --build
+
+# 終了時
+docker-compose down
+```
+
+### 4) 開発サーバー起動
 
 ```bash
 yarn dev
@@ -205,8 +219,6 @@ yarn test
 
 ## 今後の拡張予定
 
-- Prisma の導入とスキーマ定義
-- Docker コンテナ化による一貫した開発環境の構築
 - ユーザー認証（NextAuth.js または Clerk）
 - タグ・カテゴリによるタスク分類機能
 - 通知機能（期限アラート／メール連携）
