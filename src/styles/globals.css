@@ -2,208 +2,79 @@
 @tailwind components;
 @tailwind utilities;
 
-/* body のスタイルは Tailwind のクラスで代替可能 */
-body {
-  @apply min-h-screen w-full flex items-center justify-center font-sans bg-gradient-to-r from-blue-400 to-blue-800;
+/* React DatePicker カスタムスタイル */
+.react-datepicker-wrapper {
+  width: 100%;
 }
 
-/* カードスタイル */
-.card {
-  @apply bg-white p-4 md:p-6 cursor-pointer max-w-sm md:max-w-md shadow;
+.react-datepicker__input-container input {
+  width: 100%;
 }
 
-/* 見出しスタイル */
-h1 {
-  @apply text-[3rem] text-center text-black mb-8; /* mb-4 を mb-8 に変更して間隔を調整 */
+.react-datepicker {
+  font-family: inherit;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  background-color: white; /* 追加: 背景色を明示 */
 }
 
-/* コンテナスタイル */
-.container {
-  @apply w-full max-w-md mx-auto p-4 bg-white rounded-md shadow flex flex-col items-center;
-}
-/* ボタンスタイル */
-.button {
-  @apply inline-block px-4 py-2 bg-blue-500 text-white border-none rounded-md cursor-pointer mx-1;
+.react-datepicker__header {
+  background-color: #3b82f6;
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
 }
 
-.cancel-button {
-  @apply inline-block px-4 py-2 bg-red-500 text-white border-none rounded-md cursor-pointer mx-1;
+.react-datepicker__current-month,
+.react-datepicker__day-name {
+  color: white;
+  font-weight: 600;
 }
 
-/* フォームスタイル */
-.form-container {
-  @apply flex items-center gap-2 w-full mb-4 flex-wrap;
+.react-datepicker__navigation {
+  top: 12px;
+}
+.react-datepicker__navigation--previous {
+  border-right-color: white;
+}
+.react-datepicker__navigation--next {
+  border-left-color: white;
 }
 
-.form-container input,
-.form-container select,
-.date-picker {
-  @apply p-2 border border-gray-300 rounded-md mr-2;
+.react-datepicker__day {
+  border-radius: 8px;
+  transition: all 0.2s;
 }
 
-/* リストスタイル */
-ul {
-  @apply list-none w-full p-0;
+.react-datepicker__day:hover {
+  background-color: #dbeafe;
+  color: #1d4ed8;
 }
 
-li {
-  @apply flex items-center justify-between p-4 mb-2 bg-gray-100 rounded-md shadow-sm transition-all duration-300 ease-in-out flex-wrap;
+.react-datepicker__day--selected {
+  background-color: #3b82f6;
+  color: white;
 }
 
-li:hover {
-  @apply bg-gray-200 transform translate-y-[-2px];
+.react-datepicker__day--today {
+  font-weight: 600;
+  color: #3b82f6;
 }
 
-li span {
-  @apply mr-4 flex-1;
+/* スクロールバー等の調整 */
+::-webkit-scrollbar {
+  width: 6px;
 }
-
-/* スマホ向けの調整 */
-
-@media (max-width: 480px) {
-  .container {
-    @apply w-full max-w-full px-2 py-2 mx-0 rounded-none shadow-none;
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .card {
-    @apply w-full max-w-full p-2 shadow-none rounded-none;
-  }
-
-  .button,
-  .cancel-button {
-    @apply text-sm py-2 px-2 mt-2 w-full;
-    margin-left: 0 !important; /* 念のため左マージンをリセット */
-  }
-
-  .form-container {
-    flex-direction: column;
-    gap: 8px;
-    padding: 0;
-    align-items: stretch;
-    @apply w-full;
-  }
-
-  .form-container button {
-    @apply w-full;
-    margin-left: 0 !important;
-  }
-
-  ul {
-    @apply w-full;
-  }
-
-  li {
-    flex-direction: column;
-    align-items: stretch; /* ←ここを修正 */
-    @apply w-full p-2 mb-2 rounded-md;
-  }
-
-  li button {
-    @apply w-full mt-2;
-    margin-left: 0 !important; /* 念のため左マージンをリセット */
-  }
-
-  li span {
-    @apply mb-2 w-full;
-  }
-
-  /* タブレット向けの調整 (中型デバイス) */
-  @media (min-width: 481px) and (max-width: 768px) {
-    .container {
-      @apply p-4;
-    }
-
-    .button,
-    .cancel-button {
-      @apply py-2 px-4 text-base;
-    }
-
-    .form-container {
-      @apply flex-wrap p-4;
-    }
-
-    .form-container input,
-    .form-container select,
-    .date-picker {
-      @apply flex-1 min-w-[120px];
-    }
-
-    li {
-      @apply flex-wrap;
-    }
-  }
-
-  /* タブレット横向き向けの調整 */
-  @media (min-width: 769px) and (max-width: 1024px) {
-    .container {
-      @apply p-6;
-    }
-
-    .button,
-    .cancel-button {
-      @apply py-2.5 px-5 text-lg;
-    }
-  }
-
-  /* デスクトップ向けの調整 (大型デバイス) */
-  @media (min-width: 1025px) {
-    .container {
-      @apply max-w-3xl p-8;
-    }
-
-    .button,
-    .cancel-button {
-      @apply py-3 px-6 text-xl;
-    }
-  }
-
-  /* EditTodoForm のコンテナ */
-  .edit-todo-form {
-    @apply flex items-center gap-2 w-full flex-wrap;
-  }
-
-  /* 各入力要素 */
-  .edit-todo-form > div {
-    @apply flex flex-col flex-1 min-w-[150px];
-  }
-
-  .edit-todo-form input.form-container,
-  .edit-todo-form .react-datepicker-wrapper,
-  .edit-todo-form select.form-container {
-    @apply p-2 rounded-md w-full;
-    border: none; /* Tailwind の border クラスを使用する場合は削除 */
-  }
-
-  .edit-todo-form label {
-    @apply mb-1;
-  }
-
-  /* ボタンのコンテナ */
-  .edit-todo-form > div:last-child {
-    @apply flex justify-end w-full gap-2;
-  }
-
-  /* ボタン */
-  .edit-todo-form .button,
-  .edit-todo-form .cancel-button {
-    /* 既存のボタンスタイルは Tailwind の button クラスで代替可能 */
-  }
-
-  /* DatePicker の幅調整 */
-  .edit-todo-form > div:nth-child(2) {
-    flex-basis: auto;
-    min-width: auto; /* 必要に応じて調整 */
-    flex-grow: 0;
-  }
-
-  .edit-todo-form .react-datepicker-wrapper {
-    width: auto;
-  }
-
-  .edit-todo-form select.form-container {
-    width: auto;
-    min-width: 80px; /* 優先度の幅 */
-  }
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+input:focus,
+select:focus,
+button:focus {
+  outline: none;
 }
