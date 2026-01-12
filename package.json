@@ -17,11 +17,12 @@
     "@clerk/nextjs": "^6.23.3",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
-    "framer-motion": "^11.1.7",
+    "framer-motion": "^11.18.2",
+    "lucide-react": "^0.562.0",
     "next": "15.5.9",
     "pg": "^8.14.1",
     "react": "^19.0.0",
-    "react-datepicker": "^8.2.1",
+    "react-datepicker": "^8.10.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
