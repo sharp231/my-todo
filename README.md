@@ -26,16 +26,15 @@ Task Manager です。
 
 ## 技術スタック
 
-| 分類                    | 技術構成                                                |
-| ----------------------- | ------------------------------------------------------- |
-| フロントエンド          | Next.js / React / TailwindCSS                           |
-| バックエンド            | Next.js API Routes（REST API）                          |
-| データベース            | Neon（サーバーレス PostgreSQL）                         |
-| テスト                  | Thunder Client（API テスト） / Vitest（ユニットテスト） |
-| DevOps                  | GitHub Actions（`.github/workflows`） / Vercel          |
-| Docker / Docker Compose |
-| デプロイ                | Vercel                                                  |
-| パッケージ管理          | Yarn                                                    |
+| 分類           | 技術構成                                                               |
+| -------------- | ---------------------------------------------------------------------- |
+| フロントエンド | Next.js / React / TailwindCSS                                          |
+| バックエンド   | Next.js API Routes（REST API）                                         |
+| データベース   | Neon（サーバーレス PostgreSQL）                                        |
+| テスト         | Thunder Client（API テスト） / Vitest（ユニットテスト）                |
+| DevOps         | GitHub Actions（`.github/workflows`） / Vercel Docker / Docker Compose |
+| デプロイ       | Vercel                                                                 |
+| パッケージ管理 | Yarn                                                                   |
 
 ---
 
@@ -64,7 +63,6 @@ Task Manager です。
    **課題**: API Routes にロジックを書きすぎると、可読性が下がりテストが困難になる。
 
 **解決策**:
-
 Controller (pages/api): リクエストの受け付けとレスポンス返却に専念。
 Service/Data Access (src/lib): DB 操作（SQL クエリ）を分離。
 Utility (src/utils): バリデーションやエラー処理を共通化。
@@ -75,7 +73,6 @@ Utility (src/utils): バリデーションやエラー処理を共通化。
    **課題**: 不正なデータ（空文字や型違い）が DB に混入し、予期せぬエラーが発生する。
 
 **解決策**:
-
 validation.js にルールを集約し、API の入り口で厳密にチェック。
 特に completed (boolean) の型チェックや、PUT 時の必須項目チェックを徹底。
 
@@ -85,7 +82,6 @@ validation.js にルールを集約し、API の入り口で厳密にチェッ�
    **課題**: 更新処理が曖昧だと、意図しないデータの書き換えリスクがある。
 
 **解決策**:
-
 PUT: 編集フォーム保存時に使用。全フィールドを送信し、リソースを完全置換。
 PATCH: 完了チェック時に使用。変更差分（completed のみ）を送信し、部分更新。
 
