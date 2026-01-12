@@ -9,9 +9,8 @@ const Home = () => {
       <Head>
         <title>Todoアプリ</title>
         <meta name="description" content="Next.js Todoアプリ" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon.svg" />
       </Head>
-      <h1>Todoアプリ</h1>
       <TodoApp />
     </div>
   );
