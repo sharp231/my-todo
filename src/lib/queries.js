@@ -7,10 +7,10 @@ export const getTodos = async () => {
 };
 
 // Todoを追加
-export const addTodo = async (title, date, priority) => {
+export const addTodo = async (title, date, priority, completed) => {
   const result = await pool.query(
-    'INSERT INTO todos (title, date, priority) VALUES ($1, $2, $3) RETURNING *',
-    [title, date, priority]
+    'INSERT INTO todos (title, date, priority,completed) VALUES ($1, $2, $3,$4) RETURNING *',
+    [title, date, priority, completed]
   );
   return result.rows[0];
 };
@@ -32,7 +32,7 @@ export const updateTodo = async (id, fields) => {
 
   // 更新するフィールドを動的に構築
   for (const [key, value] of Object.entries(fields)) {
-    if (value !== undefined && value !== null) {
+    if (value !== undefined) {
       updates.push(`${key} = $${index}`);
       values.push(value);
       index++;
