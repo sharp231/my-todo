@@ -7,7 +7,7 @@ const Home = () => {
   return (
     <div>
       <Head>
-        <title>Todoアプリ</title>
+        <title>TaskManager</title>
         <meta name="description" content="Next.js Todoアプリ" />
         <link rel="icon" href="/favicon.svg" />
       </Head>
