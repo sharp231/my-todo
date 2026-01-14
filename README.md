@@ -175,7 +175,7 @@ yarn test
 - タグ・カテゴリによるタスク分類機能
 - 通知機能（メール連携）
 - Firebase の導入
-- feat: 公開LP(SSG)を追加しアプリ画面(/todo)と分離
+- 公開LP(SSG)を追加しアプリ画面(/todo)と分離
 - Next.js App Router & Server Actions への移行
 - データフェッチの高度化 (TanStack Query / SWR)
 
