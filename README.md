@@ -38,6 +38,11 @@ Task Manager です。
 
 ---
 
+## Lint / Test (CI)
+- ESLint uses `eslint.config.mjs`.
+- CI runs `yarn lint` and `yarn test:coverage`, and uploads `coverage/` as an artifact.
+---
+
 ### 🧠 アーキテクチャ
 
 ```bash
@@ -182,3 +187,4 @@ yarn test
 ## 🔗 公開 URL
 
 👉 [アプリを見る](https://my-todo-9h6e.vercel.app/)
+
