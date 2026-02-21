@@ -2,6 +2,7 @@
 
 Task Manager です。  
 現場で求められる**保守性・例外系・テスト・自動化**の観点を自走して再現できるよう、UI/UX から自動化までを一連の工程として扱い、**「動く」だけでなく「壊れにくい／変えやすい」コードベース**を目指しています。チーム開発を想定した構成と品質担保の仕組みづくりを重視しています。
+
 ---
 
 ## 主な機能
@@ -186,67 +187,3 @@ yarn test
 ## 🔗 公開 URL
 
 👉 [アプリを見る](https://my-todo-9h6e.vercel.app/)
-
-# Docker コンテナ内で実行 docker compose up --build# → コンテナ内で node:20-alpine を使用# → コンテナ内で yarn dev を実行# → ボリュームマウントでホットリロード対応
-
-メリット: 環境が統一される、本番に近い環境、チーム間で再現しやすい
-デメリット: 起動がやや遅い、メモリ使用量が増える
-実際の動作
-どちらも最終的には next dev を実行しますが、実行環境が異なります：
-yarn dev: Windows → ホストの Node.js → next dev
-docker compose up: Windows → Docker コンテナ（Linux） → コンテナ内の Node.js → next dev
-
-
-1. 通常の開発・動作確認 → yarn dev
-   yarn dev
-   起動が速い（数秒）
-   デバッグしやすい
-   メモリ使用量が少ない
-   ホットリロードも動作
-2. Docker を使う場面
-   docker compose up --build
-   本番環境に近い環境で確認したい時
-   チームで環境を統一したい時
-   CI/CD で Docker を使う場合の事前確認
-   Node.js バージョンや OS 差を避けたい時
-   使い分けの目安
-   作業内容 推奨方法 理由
-   コード編集・動作確認 yarn dev 速い、シンプル
-   API 動作確認 yarn dev 十分
-   本番デプロイ前の最終確認 docker compose up 本番に近い環境
-   チーム開発 チーム方針に合わせる 統一性
-   現在の状況
-   Docker 設定は完了（必要時に使える）
-   通常開発は yarn dev で問題なし
-   外部 DB（Neon）を使用しているため、どちらでも同じ DB に接続
-
-## 今後の拡張予定 (Roadmap)
-
-現在 GitHub Issues で管理しているタスクに加え、技術トレンドへの適応と DX（開発者体験）向上を目指した以下の改修を計画しています。
-
-### 🛠 アーキテクチャ刷新・モダン化 (Technical Improvements)
-**1. TypeScript への移行（最優先）**
-- **課題**: 現在の JavaScript では実行時まで型エラーに気づけないため、保守コストが高い。
-- **計画**: `.js` を `.ts/tsx` に移行し、`interface Todo` 等の型定義をフロント・バックエンド間で共有することで、コンパイル時にバグを排除する堅牢な設計にする。
-
-**2. Next.js App Router & Server Actions への移行**
-- **課題**: Pages Router (`src/pages`) と API Routes の構成では、通信オーバーヘッドが発生しやすい。
-- **計画**: 最新の `src/app` ディレクトリ構成へ移行。`use server` (Server Actions) を導入し、DB 操作を関数として直接呼び出すことで、API エンドポイント管理の手間を削減する。
-
-**3. データフェッチの高度化 (TanStack Query / SWR)**
-- **課題**: `useEffect` + `fetch` ではキャッシュ管理やローディング状態の制御が冗長になりがち。
-- **計画**: TanStack Query を導入し、自動再検証 (Revalidation) や 楽観的更新 (Optimistic UI) を実装して UX を向上させる。
-
-### ✨ 機能追加 (Feature Extensions)
-- [ ] **タグ / カテゴリ機能** (#19)
-    - タスクの分類・フィルタリング機能の実装
-- [ ] **ユーザー認証**
-    - NextAuth.js または Clerk を用いたセキュアなログイン基盤
-- [ ] **リアルタイム性 / モバイル操作性の向上** (#20)
-    - Firebase 等を活用した複数デバイス間の即時同期
-
-### 🧪 品質保証 (Quality Assurance)
-- [ ] **UI コンポーネントテストの拡充** (#17)
-    - `@testing-library/react` を用いた、ユーザー操作に近い形での DOM テスト
-- [ ] **テストカバレッジの可視化** (#18) クリア
-    - CI 上でレポートを生成し、README にバッジを表示して品質を定量化する
