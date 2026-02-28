@@ -45,7 +45,8 @@
   },
   "resolutions": {
     "tailwindcss/sucrase/glob": "10.5.0",
-    "minimatch": ">=10.2.1",
-    "ajv": "^6.12.6"
+    "minimatch": ">=10.2.3",
+    "ajv": "^6.12.6",
+    "rollup": ">=4.59.0"
   }
 }
