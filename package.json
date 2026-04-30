@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@clerk/backend": "^3.2.12",
-    "@clerk/nextjs": "6.39.2",
+    "@clerk/nextjs": "6.39.3",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
     "framer-motion": "^11.18.2",
