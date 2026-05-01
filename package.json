@@ -15,8 +15,8 @@
     "test:full": "yarn test:setup && yarn test:coverage && yarn test:cleanup"
   },
   "dependencies": {
-    "@clerk/backend": "^3.2.12",
-    "@clerk/nextjs": "6.39.2",
+    "@clerk/backend": "3.2.14",
+    "@clerk/nextjs": "6.39.3",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
     "framer-motion": "^11.18.2",
@@ -38,7 +38,7 @@
     "eslint-config-next": "16.2.3",
     "jsdom": "^26.1.0",
     "node-mocks-http": "^1.17.2",
-    "postcss": "^8",
+    "postcss": "8.5.10",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.9.3",
     "vite": "7.3.2",
@@ -50,6 +50,7 @@
     "ajv": "^6.12.6",
     "rollup": ">=4.59.0",
     "flatted": "^3.4.0",
+    "postcss": "8.5.10",
     "picomatch": "4.0.4",
     "brace-expansion": ">=5.0.5"
   }
