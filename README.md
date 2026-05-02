@@ -1,6 +1,5 @@
 # Task Manager（Next.js / API Routes / Neon）
 
-Task Manager です。  
 現場で求められる**保守性・例外系・テスト・自動化**の観点を自走して再現できるよう、UI/UX から自動化までを一連の工程として扱い、**「動く」だけでなく「壊れにくい／変えやすい」コードベース**を目指しています。チーム開発を想定した構成と品質担保の仕組みづくりを重視しています。
 
 ---
@@ -26,24 +25,19 @@ Task Manager です。
 
 ## 技術スタック
 
-| 分類           | 技術構成                                                               |
-| -------------- | ---------------------------------------------------------------------- |
-| フロントエンド | Next.js / React / TailwindCSS                                          |
-| バックエンド   | Next.js API Routes（REST API）                                         |
-| データベース   | Neon（サーバーレス PostgreSQL）                                        |
-| テスト         | Thunder Client（API テスト） / Vitest（ユニットテスト）                |
-| DevOps         | GitHub Actions（`.github/workflows`） / Vercel Docker / Docker Compose |
-| デプロイ       | Vercel                                                                 |
-| パッケージ管理 | Yarn                                                                   |
+| 分類           | 技術構成                                                |
+| -------------- | ------------------------------------------------------- |
+| フロントエンド | Next.js / React / TailwindCSS                           |
+| バックエンド   | Next.js API Routes（REST API）                          |
+| データベース   | Neon（サーバーレス PostgreSQL）                         |
+| テスト         | Thunder Client（API テスト） / Vitest（ユニットテスト） |
+| DevOps         | GitHub Actions / Docker / Docker Compose                |
+| デプロイ       | Vercel                                                  |
+| パッケージ管理 | Yarn                                                    |
 
 ---
 
-## Lint / Test (CI)
-- ESLint uses `eslint.config.mjs`.
-- CI runs `yarn lint` and `yarn test:coverage`, and uploads `coverage/` as an artifact.
----
-
-### 🧠 アーキテクチャ
+### アーキテクチャ
 
 ```bash
 /
@@ -62,7 +56,7 @@ Task Manager です。
 ## 設計の意図（課題 → 解決策 → 成果）
 
 設計の意図（課題解決のアプローチ）
-実務でのチーム開発を想定し、以下の課題に対して意図的な設計を行いました。
+実務でのチーム開発を想定し、保守性、例外系、テスト容易性を重視して設計しました。
 
 1. 責務の分離とモジュール化
    **課題**: API Routes にロジックを書きすぎると、可読性が下がりテストが困難になる。
@@ -128,8 +122,11 @@ DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DBNAME?sslmode=require"
 Docker および Docker Compose がインストールされている必要があります
 
 ```bash
-# 開発サーバー起動（ホットリロード有効）
+# 開発サーバー起動（ホットリロード有効）初回 or Dockerfile・依存関係変更時
 docker-compose up --build
+
+# 2回目以降
+docker-compose up
 
 # 終了時
 docker-compose down
@@ -145,9 +142,11 @@ yarn dev
 
 ## テスト / 品質管理
 
-- **CI（GitHub Actions）**：CI：GitHub Actions で Push / Pull Request 時にビルド・テストを自動実行
-- **API テスト（Thunder Client）**：Thunder Client で正常系・異常系（入力不備、存在しない ID など）を確認
-- **ユニットテスト（Vitest）**：ユニットテスト：src/**tests** 配下にテストを配置し、Vitest で検証
+- **Lint:** ESLint による静的解析
+- **ユニットテスト:** Vitest によるロジック検証
+- **カバレッジ:** `yarn test:coverage` で取得
+- **CI:** GitHub Actions で Push / Pull Request 時に `yarn lint` と `yarn test:coverage` を自動実行
+- **API テスト:** Thunder Client で正常系・異常系を確認
 
 ```bash
 yarn test
@@ -157,7 +156,7 @@ yarn test
 
 ## API 仕様（概要）
 
-> API Routes の性質上、エンドポイントは `pages/api`配下のファイル名で決まります。
+API Routes の性質上、エンドポイントは `pages/api`配下のファイル名で決まります。
 
 - `GET`：一覧取得
 - `POST`：新規作成（例：`{ "title": "Task", "date": "2025-01-01", "priority": "high", "completed": false }`）
