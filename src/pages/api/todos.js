@@ -1,100 +1,101 @@
 import { getTodos, addTodo, deleteTodo, updateTodo } from '../../lib/queries';
-import { handleError } from '../../utils/errorHandler';
-import { validateTodoInput, validateCompleteTodoInput, validateId, validateUpdateTodoInput } from '../../utils/validation';
+import { ApiError, ERROR_CODES, handleError } from '../../utils/errorHandler';
+import { validateCreateTodoInput, validateReplaceTodoInput, validatePatchTodoInput, validateTodoId } from '../../utils/validation';
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+const ALLOWED_METHODS = ['GET', 'POST', 'DELETE', 'PUT', 'PATCH'];
+
+const todoNotFound = (id) =>
+  new ApiError(ERROR_CODES.NOT_FOUND, 'Todo not found', {
+    details: { resource: 'todo', id },
+  });
+// JSONパース不可やContent-Type不備は、リクエスト形式不正として400を返す。
+const readJsonBody = async (req) => {
+  const contentType = req.headers['content-type'] ?? '';
+
+  if (!contentType.includes('application/json')) {
+    throw new ApiError(ERROR_CODES.BAD_REQUEST, 'Content-Type must be application/json', {
+      details: { header: 'Content-Type' },
+    });
+  }
+  const chunks = [];
+  for await (const chunk of req) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  }
+  const rawBody = Buffer.concat(chunks).toString('utf8');
+  if (!rawBody.trim()) {
+    throw new ApiError(ERROR_CODES.BAD_REQUEST, 'request body is required');
+  }
+  try {
+    return JSON.parse(rawBody);
+  } catch (error) {
+    throw new ApiError(ERROR_CODES.BAD_REQUEST, 'request body must be valid JSON', {
+      cause: error,
+    });
+  }
+
+};
 
 export default async function handler(req, res) {
-  res.setHeader('Allow', ['GET', 'POST', 'DELETE', 'PUT', 'PATCH']);
+  res.setHeader('Allow', ALLOWED_METHODS);
 
-  if (req.method === 'GET') {
-    try {
+  try {
+    if (req.method === 'GET') {
       const todos = await getTodos();
-      res.status(200).json(todos);
-    } catch (error) {
-      handleError(res, error, 'Error fetching todos');
+      return res.status(200).json(todos);
     }
-  } else if (req.method === 'POST') {
-    const { title, date, priority, completed } = req.body;
-
-    // バリデーション
-    const validationError = validateTodoInput(title, date, priority, completed);
-    if (validationError) {
-      return res.status(400).json(validationError);
+    if (req.method === 'POST') {
+      const body = await readJsonBody(req);
+      const input = validateCreateTodoInput(body);
+      const newTodo = await addTodo(input.title, input.date, input.priority, input.completed);
+      return res.status(201).json(newTodo);
     }
+    if (req.method === 'DELETE') {
+      const id = validateTodoId(req.query.id);
+      const deletedCount = await deleteTodo(id);
 
-    try {
-      // DB関数にcompletedを渡す・　completedがundefinedの場合はfalseとするなど初期値処理推奨
-      const isCompleted = completed === true || completed === 'true';
-      const newTodo = await addTodo(title, date, priority, isCompleted);
-      res.status(201).json(newTodo);
-    } catch (error) {
-      handleError(res, error, 'Error adding todo');
-    }
-  } else if (req.method === 'DELETE') {
-    const { id } = req.query;
+      if (deletedCount === 0) throw todoNotFound(id);
 
-    // バリデーション
-    const validationError = validateId(id);
-    if (validationError) {
-      return res.status(400).json(validationError);
+      return res.status(200).json({ message: 'Todo deleted successfully' });
     }
 
-    try {
-      await deleteTodo(id);
-      res.status(200).json({ message: 'Todo deleted successfully' });
-    } catch (error) {
-      handleError(res, error, 'Error deleting todo');
+    if (req.method === 'PUT') {
+      const body = await readJsonBody(req);
+      const input = validateReplaceTodoInput(body);
 
-    }
-  } else if (req.method === 'PUT') {
-    // ■ 完全置換(PUT) ■
-    // body: { id, title, date, priority }
-    const { id, title, date, priority, completed } = req.body;
-    if (!id) {
-      return res.status(400).json({ error: 'ID is required' });
-    }
-    const err = validateCompleteTodoInput({ title, date, priority, completed });
-    if (err) return res.status(400).json(err);
+      const updatedTodo = await updateTodo(input.id, {
+        title: input.title,
+        date: input.date,
+        priority: input.priority,
+        completed: input.completed,
+      });
 
-    try {
-      // updateTodoにcompletedも渡す
-      const updatedTodo = await updateTodo(id, { title, date, priority, completed });
-      if (!updatedTodo) {
-        return res.status(404).json({ error: 'Todo not found' });
-      }
+      if (!updatedTodo) throw todoNotFound(input.id);
+
       return res.status(200).json({
         message: 'Todo completely replaced',
         method: 'PUT',
-        todo: updatedTodo
+        todo: updatedTodo,
       });
-    } catch (error) {
-      handleError(res, error, 'Error replacing todo');
     }
+    if (req.method === 'PATCH') {
+      const body = await readJsonBody(req);
+      const input = validatePatchTodoInput(body);
+      const updatedTodo = await updateTodo(input.id, input.fields)
 
-  } else if (req.method === 'PATCH') {
-    // ■ 部分更新(PATCH) ■
-    // completedを追加(完了チェックボックスの切り替え)
-    const { id, title, date, priority, completed } = req.body;
-    const validationError = validateUpdateTodoInput(id, title, date, priority, completed);
-    if (validationError) {
-      return res.status(400).json(validationError);
+      if (!updatedTodo) throw todoNotFound(input.id);
+
+      return res.status(200).json(updatedTodo);
     }
-    try {
-      const updateData = {};
-      if (title !== undefined) updateData.title = title;
-      if (date !== undefined) updateData.date = date;
-      if (priority !== undefined) updateData.priority = priority;
-      if (completed !== undefined) updateData.completed = completed;
+    throw new ApiError(ERROR_CODES.METHOD_NOT_ALLOWED, `Method ${req.method} NotAllowed`);
+  } catch (error) {
+    return handleError(res, error);
 
-      const updatedTodo = await updateTodo(id, updateData);
-      if (!updatedTodo) return res.status(404).json({ error: 'Todo not found' });
 
-      res.status(200).json(updatedTodo); // 更新後のデータを返す
-    } catch (error) {
-      console.error('Error updating todo:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  } else {
-    res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
-
