@@ -1,106 +1,109 @@
 import { describe, test, expect } from 'vitest';
-import { 
-  validateTodoInput, 
-  validateId, 
-  validateUpdateTodoInput, 
-  validateCompleteTodoInput 
+import { ApiError, ERROR_CODES } from '../utils/errorHandler';
+import {
+  validateCreateTodoInput,
+  validatePatchTodoInput,
+  validateReplaceTodoInput,
+  validateTodoId,
 } from '../utils/validation';
 
+// 新バリデーションは失敗時に ApiError をthrowするため、共通helperでcode/detailsを検証する。
+const expectApiError = (fn, code, details) => {
+  let caught;
+  try {
+    fn();
+  } catch (error) {
+    caught = error;
+  }
+  expect(caught).toBeInstanceOf(ApiError);
+  expect(caught.code).toBe(code);
+  if (details) expect(caught.details).toMatchObject(details);
+};
+
 describe('Todo Validation Tests', () => {
-  // ■ POST Validation
-  describe('validateTodoInput', () => {
-    test('should return null for valid input', () => {
-      const result = validateTodoInput('Test Task', '2024-03-20', 'medium', false);
-      expect(result).toBeNull();
-    });
-
-    test('should return error if title is invalid or missing', () => {
-      const result = validateTodoInput('', '2024-03-20', 'medium');
-      expect(result).toEqual({ error: 'Invalid or missing "title"' });
-    });
-
-    test('should return error for invalid date format', () => {
-      const result = validateTodoInput('Test Task', 'invalid-date', 'medium');
-      expect(result).toEqual({ error: 'Invalid "date" format' });
-    });
-
-    test('should return error for invalid priority value', () => {
-      const result = validateTodoInput('Test Task', '2024-03-20', 'invalid');
-      expect(result).toEqual({ error: 'Invalid "priority" value' });
-    });
-
-    test('should return error if completed is not a boolean', () => {
-      const result = validateTodoInput('Test Task', '2024-03-20', 'medium', 'true_string');
-      expect(result).toEqual({ error: 'Invalid "completed" value (must be boolean)' });
+  test("valid create input is normalized", () => {
+    expect(validateCreateTodoInput({
+      title: ' Test Task ',
+      date: '2024-03-20',
+      priority: 'medium',
+    })).toEqual({
+      title: 'Test Task',
+      date: '2024-03-20',
+      priority: 'medium',
+      completed: false,
     });
   });
 
-  // ■ ID Validation
-  describe('validateId', () => {
-    test('should return null for valid numeric ID', () => {
-      const result = validateId('123');
-      expect(result).toBeNull();
-    });
+  test('create rejects empty title', () => {
+    expectApiError(
+      () => validateCreateTodoInput({ title: '', date: '2024-03-20', priority: 'medium' }),
+      ERROR_CODES.VALIDATION_ERROR,
+      { field: 'title' }
+    );
+  });
+  // 各メソッドで入力検証を通してからDB処理を行い、API契約を一貫させる。
+  test('create rejects unexpected fields', () => {
+    expectApiError(
+      () => validateCreateTodoInput({ title: 'x', date: '2024-03-20', priority: 'medium', extra: true }),
+      ERROR_CODES.BAD_REQUEST,
+      { fields: ['extra'] }
+    );
+  });
 
-    test('should return error for non-numeric ID', () => {
-      const result = validateId('abc');
-      expect(result).toEqual({ error: 'Invalid or missing "id"' });
+  test('create rejects invalid priority', () => {
+    expectApiError(
+      () => validateCreateTodoInput({ title: 'x', date: '2024-03-20', priority: 'urgent' }),
+      ERROR_CODES.VALIDATION_ERROR,
+      { field: 'priority' }
+    );
+  });
+
+  test('valid id is converted to number', () => {
+    expect(validateTodoId('123')).toBe(123);
+  });
+
+  test('valid patch input returns id and fields', () => {
+    expect(validatePatchTodoInput({ id: '123', completed: true })).toEqual({
+      id: 123,
+      fields: { completed: true },
     });
   });
 
-  // ■ PATCH Validation (Partial Update)
-  describe('validateUpdateTodoInput', () => {
-    test('should return null for valid partial input', () => {
-      const result = validateUpdateTodoInput('123', 'Updated Task', '2024-03-20', 'high', true);
-      expect(result).toBeNull();
-    });
+  test.each([
+    ['title', { title: null }],
+    ['date', { date: null }],
+    ['priority', { priority: null }],
+    ['completed', { completed: null }],
+  ])('patch rejects null %s', (field, patch) => {
 
-    test('should return error if ID is invalid', () => {
-      const result = validateUpdateTodoInput('abc', 'Updated Task', '2024-03-20', 'high');
-      expect(result).toEqual({ error: 'Invalid or missing "id"' });
-    });
+    expectApiError(
+      () => validatePatchTodoInput({ id: 123, ...patch }),
+      ERROR_CODES.VALIDATION_ERROR,
+      { field }
+    );
+  });
 
-    test('should return error if title is invalid type', () => {
-      const result = validateUpdateTodoInput('123', 123, '2024-03-20', 'high');
-      expect(result).toEqual({ error: 'Invalid "title"' });
-    });
-    
-    test('should return error if completed is not a boolean', () => {
-      const result = validateUpdateTodoInput('123', undefined, undefined, undefined, 'not-boolean');
-      expect(result).toEqual({ error: 'Invalid "completed" value (must be boolean)' });
+  test('valid replace input returns full todo', () => {
+    expect(validateReplaceTodoInput({
+      id: '123',
+      title: 'Task',
+      date: '2024-03-20',
+      priority: 'low',
+      completed: false,
+    })).toEqual({
+      id: 123,
+      title: 'Task',
+      date: '2024-03-20',
+      priority: 'low',
+      completed: false,
     });
   });
 
-  // ■ PUT Validation (Complete Update)
-  describe('validateCompleteTodoInput', () => {
-    test('should return null when all required fields are present and valid', () => {
-      const result = validateCompleteTodoInput({
-        title: 'Completed Task',
-        date: '2024-03-20',
-        priority: 'low',
-        completed: false
-      });
-      expect(result).toBeNull();
-    });
-
-    test('should return error if required field "title" is missing', () => {
-      const result = validateCompleteTodoInput({
-        title: '',
-        date: '2024-03-20',
-        priority: 'low',
-        completed: false
-      });
-      expect(result).toEqual({ error: 'Invalid or missing "title"' });
-    });
-
-    test('should return error if required field "completed" is missing', () => {
-      const result = validateCompleteTodoInput({
-        title: 'Completed Task',
-        date: '2024-03-20',
-        priority: 'low'
-        // completed missing
-      });
-      expect(result).toEqual({ error: 'Invalid or missing "completed" value' });
-    });
+  test('replace rejects missing completed', () => {
+    expectApiError(
+      () => validateReplaceTodoInput({ id: 123, title: 'Task', date: '2024-03-20', priority: 'low' }),
+      ERROR_CODES.VALIDATION_ERROR,
+      { field: 'completed' }
+    );
   });
 });
