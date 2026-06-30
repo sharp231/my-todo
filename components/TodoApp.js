@@ -48,7 +48,11 @@ const TodoApp = () => {
         body: JSON.stringify(payload)                    // ★必須
       });
 
-      if (!res.ok) throw new Error('追加に失敗しました');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        console.error('POST Failed:', errorData);
+        throw new Error(errorData?.error?.message ?? '追加に失敗しました');
+      }
 
       const newTodo = await res.json();
 
@@ -67,18 +71,25 @@ const TodoApp = () => {
   const toggleTodo = async (id) => {
     // まず画面を更新（サクサク動くように）
     const target = todos.find(t => t.id === id);
+    if (!target) return;
+    const previousStatus = target.completed;
     const newStatus = !target.completed;
     setTodos(prev => prev.map(t => t.id === id ? { ...t, completed: newStatus } : t));
 
     try {
       // APIに送信
-      await fetch('/api/todos', {
+      const res = await fetch('/api/todos', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id, completed: newStatus })
       });
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.error?.message ?? '完了状態の更新に失敗しました');
+      }
     } catch (error) {
       console.error("PATCH Error:", error);
+      setTodos(prev => prev.map(t => t.id === id ? { ...t, completed: previousStatus } : t));
       // エラーなら元に戻す処理を入れるのがベスト
     }
   };
@@ -132,7 +143,7 @@ const TodoApp = () => {
         // エラー詳細をログに出す
         const errorData = await res.json();
         console.error("PUT Failed:", errorData);
-        alert(`更新に失敗しました: ${errorData.error}`);
+        alert(`更新に失敗しました: ${errorData?.error?.message}`);
       }
     } catch (error) {
       console.error("PUT Error:", error);
