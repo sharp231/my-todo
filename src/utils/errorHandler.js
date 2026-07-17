@@ -6,6 +6,7 @@ export const ERROR_CODES = Object.freeze({
   CONFLICT: 'CONFLICT',
   INTERNAL_ERROR: 'INTERNAL_ERROR',
   METHOD_NOT_ALLOWED: 'METHOD_NOT_ALLOWED',
+  SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
 });
 
 const STATUS_BY_CODE = {
@@ -15,6 +16,7 @@ const STATUS_BY_CODE = {
   [ERROR_CODES.CONFLICT]: 409,
   [ERROR_CODES.METHOD_NOT_ALLOWED]: 405,
   [ERROR_CODES.INTERNAL_ERROR]: 500,
+  [ERROR_CODES.SERVICE_UNAVAILABLE]: 503,
 };
 // ApiError にHTTPステータス・code・detailsを持たせ、レスポンス形式を統一する。
 export class ApiError extends Error {
