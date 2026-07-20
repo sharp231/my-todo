@@ -26,7 +26,7 @@
 
 ## 技術スタック
 
-| 分類           | 技術構成                       |
+| 領域           | 技術                           |
 | -------------- | ------------------------------ |
 | フロントエンド | Next.js / React / TailwindCSS  |
 | バックエンド   | Next.js API Routes（REST API） |
@@ -60,7 +60,6 @@
 ## 設計の意図（課題 → 解決策 → 成果）
 
 設計の意図（課題解決のアプローチ）
-実務でのチーム開発を想定し、保守性、例外系、テスト容易性を重視して設計しました。
 
 1. 責務の分離とモジュール化
    **課題**: API Routes にロジックを書きすぎると、可読性が下がりテストが困難になる。
@@ -73,12 +72,12 @@ Utility (src/utils): バリデーションやエラー処理を共通化。
 **成果**: API処理、DB処理、入力検証の責務が分かれ、変更やテストの対象を絞りやすくなった。
 
 2. 厳格なバリデーションと安全性
-   **課題**: 不正なデータ（空文字、型違い、\null`、想定外フィールド）が DB に混入し、予期せぬエラーやデータ不整合につながる。
+   **課題**: 不正なデータ（空文字、型違い、`null`、想定外フィールド）が DB に混入し、予期せぬエラーやデータ不整合につながる。
 
 **解決策**:
 validation.js にルールを集約し、API の入り口で検証。
 `POST` / `PUT` / `PATCH` / `DELETE` ごとに必要な入力を分け、`400 BAD_REQUEST` と `422 VALIDATION_ERROR` を使い分ける。
-APIエラーは`{error :{ code, message, details }}`形式に統一し、フロントエンドやテストからに機械的に判定できるようにする。
+APIエラーは`{error :{ code, message, details }}`形式に統一し、フロントエンドやテストから機械的に判定できるようにする。
 
 **成果**: 不正入力をDB処理前に拒否できるようになり、フロントエンド・バックエンド間のAPI契約が明確になった。
 `PATCH`で`null`が送られた場合も`422 VALIDATION_ERROR`として扱えるようになり、DB層での想定外エラーを防止できる。
@@ -163,7 +162,7 @@ yarn test:full
 
 ---
 
-## API 仕様（概要）
+## API 仕様
 
 エンドポイント: `/api/todos`
 
@@ -175,8 +174,15 @@ yarn test:full
 | `PUT`    | Todo完全置換 | `{ "id": 1, "title": "Edit", "date": "2025-01-01", "priority": "medium", "completed": false }` |
 | `PATCH`  | Todo部分更新 | `{ "id": 1, "completed": true }`                                                               |
 
-`PUT` はリソース全体の完全置換、`PATCH` は一部フィールドのみの部分更新として扱います。  
-フロントエンドでは、完了状態の切り替えに `PATCH` を使用しています。
+`POST` / `PUT` / `PATCH` では、`Content-Type: application/json` を指定してください。
+
+| Method   | HTTP Status | 主なレスポンス                                    |
+| -------- | ----------- | ------------------------------------------------- |
+| `GET`    | 200         | Todoの配列                                        |
+| `POST`   | 201         | 作成されたTodo                                    |
+| `DELETE` | 200         | `{ "message": "Todo deleted successfully" }`      |
+| `PUT`    | 200         | `{ "message", "method": "PUT", "todo": { ... } }` |
+| `PATCH`  | 200         | 更新されたTodo                                    |
 
 ### バリデーション方針
 
@@ -190,6 +196,60 @@ Todo APIでは、リクエスト入力をDB処理の前に検証します。
 | `DELETE`                       | query parameter の `id` を正の整数として検証する                                          |
 | 想定外フィールド               | `400 BAD_REQUEST` として拒否する                                                          |
 | 型違い・空文字・不正値・`null` | `422 VALIDATION_ERROR` として拒否する                                                     |
+
+`PUT` はリソース全体の完全置換、`PATCH` は一部フィールドのみの部分更新として扱います。  
+ フロントエンドでは、完了状態の切り替えに `PATCH` を使用しています。
+
+`POST` / `PUT` / `PATCH`で、リクエスト本文が空、JSON形式が不正、または`Content-Type`が不正な場合は、`400 BAD_REQUEST`を返します。
+
+### DB接続確認 API
+
+エンドポイント: `GET /api/health/db`
+
+Neon PostgreSQLへの接続状態を確認するためのヘルスチェックAPIです。  
+DBに対して`SELECT 1 AS health`のみを実行し、Todoデータの作成・取得・更新・削除は行いません。
+
+#### 正常時
+
+- HTTP Status: `200 OK`
+- `Allow: GET`
+- `Cache-Control: no-store`
+
+```json
+{
+  "status": "ok",
+  "checks": {
+    "database": "ok"
+  }
+}
+```
+
+### DB接続失敗時
+
+DBが利用できない場合は、内部の接続情報、SQL、スタックトレースをレスポンスに含めず、`503`
+`SERVICE_UNAVAILABLE`を返します。
+
+```json
+{
+  "error": {
+    "code": "SERVICE_UNAVAILABLE",
+    "message": "Database unavailable"
+  }
+}
+```
+
+### GET以外のメソッド
+
+`GET`以外のメソッドには、`405 METHOD_NOT_ALLOWED`を返します。
+
+```json
+{
+  "error": {
+    "code": "METHOD_NOT_ALLOWED",
+    "message": "Method POST Not Allowed"
+  }
+}
+```
 
 ### エラーレスポンス形式
 
@@ -207,15 +267,19 @@ APIエラーは以下の形式で統一しています。
 }
 ```
 
+`details`はエラーに補足情報がある場合のみ含まれます。
+
 ### 主なエラーコード
 
-| HTTP Status | code               | 用途                                                 |
-| ----------- | ------------------ | ---------------------------------------------------- |
-| 400         | `BAD_REQUEST`      | JSON形式不正、Content-Type不備、想定外フィールドなど |
-| 404         | `NOT_FOUND`        | 対象Todoが存在しない場合                             |
-| 409         | `CONFLICT`         | DB制約違反などの競合                                 |
-| 422         | `VALIDATION_ERROR` | 入力値の型・内容が不正な場合                         |
-| 500         | `INTERNAL_ERROR`   | 想定外のサーバーエラー                               |
+| HTTP Status | code                  | 用途                                             |
+| ----------- | --------------------- | ------------------------------------------------ |
+| 400         | `BAD_REQUEST`         | JSON形式不正、Content-Type不備、想定外フィールド |
+| 404         | `NOT_FOUND`           | 対象Todoが存在しない場合                         |
+| 405         | `METHOD_NOT_ALLOWED`  | 許可されていないHTTPメソッド                     |
+| 409         | `CONFLICT`            | PostgreSQLの一意制約違反（`23505`）              |
+| 422         | `VALIDATION_ERROR`    | 入力値の型・内容が不正な場合                     |
+| 500         | `INTERNAL_ERROR`      | 想定外のサーバーエラー                           |
+| 503         | `SERVICE_UNAVAILABLE` | DBへ接続できない場合                             |
 
 ---
 
@@ -228,13 +292,11 @@ APIエラーは以下の形式で統一しています。
 
 ## 今後の拡張予定
 
-- ユーザー認証（NextAuth.js または Clerk）
-- タグ・カテゴリによるタスク分類機能
-- 通知機能（メール連携）
-- Firebase の導入
-- 公開LP(SSG)を追加しアプリ画面(/todo)と分離
-- Next.js App Router & Server Actions への移行
-- データフェッチの高度化 (TanStack Query / SWR)
+- DB schema/migration一元化
+- テストDB安全化
+- db-utils単体テスト
+- ユーザー認証（Clerk）
+- API/DBセキュリティ強化
 
 ## 🔗 公開 URL
 
