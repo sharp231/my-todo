@@ -18,6 +18,20 @@ const STATUS_BY_CODE = {
   [ERROR_CODES.INTERNAL_ERROR]: 500,
   [ERROR_CODES.SERVICE_UNAVAILABLE]: 503,
 };
+
+const SAFE_INTERNAL_ERROR_CODE_PATTERN = /^[A-Z0-9_]{1,20}$/;
+
+const getSafeInternalErrorCode = (error) => {
+  const code = error?.code;
+  if (
+    typeof code === 'string' &&
+    SAFE_INTERNAL_ERROR_CODE_PATTERN.test(code)
+  ) {
+    return code;
+  }
+  return undefined;
+};
+
 // ApiError にHTTPステータス・code・detailsを持たせ、レスポンス形式を統一する。
 export class ApiError extends Error {
   constructor(code, message, options = {}) {
@@ -40,14 +54,24 @@ const normalizeError = (error) => {
     });
   }
   return new ApiError(ERROR_CODES.INTERNAL_ERROR, 'Internal Server Error', {
-    cause: error,
+    cause: error
+  });
+};
+const logInternalError = (normalized, originError) => {
+  const cause = normalized.cause ?? originError;
+  const internalCode = getSafeInternalErrorCode(cause);
+
+  console.error(`API request failed`, {
+    code: normalized.code,
+    status: normalized.status,
+    ...(internalCode ? { internalCode } : {}),
   });
 };
 // 例外を統一フォーマット { error: { code, message, details } } に変換して返す。
 export const handleError = (res, error) => {
   const normalized = normalizeError(error);
   if (normalized.status >= 500) {
-    console.error(normalized.message, normalized.cause ?? error);
+    logInternalError(normalized, error);
   }
   return res.status(normalized.status).json({
     error: {
@@ -56,5 +80,4 @@ export const handleError = (res, error) => {
       ...(normalized.details ? { details: normalized.details } : {}),
     }
   });
-
 };
