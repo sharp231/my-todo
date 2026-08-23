@@ -120,7 +120,7 @@ yarn install
 プロジェクトルートに `.env.local` を作成し、`DATABASE_URL` を設定します。
 
 ```env
-DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DBNAME?sslmode=require"
+DATABASE_URL="postgresql://USER:PASSWORD@NEON_POOLER_HOST/DBNAME?sslmode=verify-full"
 ```
 
 ### 3) 開発サーバー起動
