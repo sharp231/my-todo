@@ -2,11 +2,11 @@ name: Migrate production database
 
 on:
   workflow_dispatch:
-  inputs:
-    confirmation:
-    description: Type migrate-production
-    required: true
-    type: string
+    inputs:
+      confirmation:
+        description: Type migrate-production
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -21,46 +21,45 @@ jobs:
     timeout-minutes: 2
 
     steps:
-      -name: Validate migration request
-      env:
-        CONFIRMATION: ${{inputs.confirmation}}
-        TARGET_REF: ${{github.ref}}
-    run: |
-      if["$TARGET_REF" != "refs/heads/main"]; then
-        echo "Production migration must run from main"
-        exit 1
-      fi
+      - name: Validate migration request
+        env:
+          CONFIRMATION: ${{ inputs.confirmation }}
+          TARGET_REF: ${{ github.ref }}
+        run: |
+          if [ "$TARGET_REF" != "refs/heads/main" ]; then
+            echo "Production migration must run from main"
+            exit 1
+          fi
 
-      if["$CONFIRMATION" != "migrate-production"];then
-        echo "Invalid confirmation"
-        exit 1
-      fi
+          if [ "$CONFIRMATION" != "migrate-production" ]; then
+            echo "Invalid confirmation"
+            exit 1
+          fi
 
-migrate:
-  needs: validate
-  runs-on: ubuntu-latest
-  timeout-minutes: 10
-  environment: production-database
+  migrate:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production-database
 
-  env:
-  DATABASE_URL: ${{secrets.PRODUCTION_DATABASE_URL}}
+    env:
+      DATABASE_URL: ${{ secrets.PRODUCTION_DATABASE_URL }}
 
-  steps:
-    -name: Checkout repository
-     uses: actions/checkout@v4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    -name: Use.Node.js 22 
-      uses: actions/setup-node@v4
-      with:
-        node-version: 22
-        cache: yarn
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
 
-    -name: Install dependencies
-      run: yarn install --frozen-lockfile
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
 
-    -name: Apply production migrations
-      run: yarn db:migrate:production
+      - name: Apply production migrations
+        run: yarn db:migrate:production
 
-    -name: Verify production database
-      run:yarn db:verify:production
-
+      - name: Verify production database
+        run: yarn db:verify:production
