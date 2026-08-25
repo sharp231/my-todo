@@ -9,10 +9,16 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "cross-env NODE_ENV=test vitest run",
-    "test:setup": "cross-env NODE_ENV=test node -r dotenv/config scripts/setup-test-db.js dotenv_config_path=.env.test",
-    "test:cleanup": "cross-env NODE_ENV=test node -r dotenv/config scripts/cleanup-test-db.js dotenv_config_path=.env.test",
+    "db:migration:create": "node-pg-migrate create --migrations-dir migrations --migration-file-language cjs --migration-filename-format index",
+    "db:migrate": "yarn db:migrate:production",
+    "db:migrate:production": "cross-env NODE_ENV=production node-pg-migrate up --database-url-var DATABASE_URL --migrations-dir migrations --migrations-table schema_migrations --schema public --single-transaction --advisory-lock-mode fail",
+    "db:migrate:test": "cross-env NODE_ENV=test DOTENV_CONFIG_PATH=.env.test node -r dotenv/config scripts/setup-test-db.js",
+    "test:setup": "yarn db:migrate:test",
+    "test:cleanup": "cross-env NODE_ENV=test DOTENV_CONFIG_PATH=.env.test node -r dotenv/config scripts/cleanup-test-db.js",
     "test:coverage": "cross-env NODE_ENV=test vitest run --coverage",
-    "test:full": "yarn test:setup && yarn test:coverage && yarn test:cleanup"
+    "test:db": "cross-env NODE_ENV=test DOTENV_CONFIG_PATH=.env.test node -r dotenv/config node_modules/vitest/vitest.mjs run --config vite.db.config.js",
+    "test:full": "yarn test:coverage && yarn test:db",
+    "db:verify:production": "cross-env NODE_ENV=production node scripts/verify-production-db.js"
   },
   "dependencies": {
     "@clerk/backend": "^3.8.2",
@@ -39,6 +45,7 @@
     "eslint-config-next": "16.2.11",
     "jsdom": "^26.1.0",
     "node-mocks-http": "^1.17.2",
+    "node-pg-migrate": "^9.0.0",
     "postcss": "^8.5.22",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.9.3",
