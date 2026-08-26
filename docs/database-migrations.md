@@ -1,3 +1,52 @@
+# Database migration runbook
+
+## 対象
+
+この文書は、My TodoのPostgreSQL migrationをproductionへ適用する際の
+確認、実行、検証、復旧手順を定義する。
+
+## 正本
+
+- Migration: `migrations/`
+- Migration履歴: `public.schema_migrations`
+- Production table: `public.todos`
+- Production migration: `yarn db:migrate:production`
+- Production verification: `yarn db:verify:production`
+
+productionとtestは、同じmigrationファイルを使用する。
+
+## 安全ルール
+
+- productionへ`test:db`を実行しない
+- productionへ`test:cleanup`を実行しない
+- `DATABASE_URL`をログ、Issue、PRへ記載しない
+- migrationは`main`のレビュー済みcommitから実行する
+- production migrationはGitHub Environmentの承認後に実行する
+- baseline migrationに対して`down`を実行しない
+- production上でmigrationを手動修正しない
+
+## 適用前確認
+
+- [ ] `yarn lint`が成功している
+- [ ] `yarn test:coverage`が成功している
+- [ ] `yarn test:db`が成功している
+- [ ] GitHub Actionsが成功している
+- [ ] Vercel Previewが正常に動作している
+- [ ] Neon productionから検証用子ブランチを作成した
+- [ ] 子ブランチでmigrationが成功した
+- [ ] 子ブランチでschema検証が成功した
+- [ ] migration実行時刻と対象commit SHAを記録した
+- [ ] Neonのhistory windowを確認した
+
+## データ件数の記録
+
+migration前にNeon SQL Editorで実行し、結果を記録する。
+
+```sql
+SELECT
+  count(*)::bigint AS todo_count,
+  max(id) AS maximum_todo_id
+FROM public.todos;
 ```
 
 タイトルなどの実データは記録しない。
