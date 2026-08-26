@@ -84,7 +84,7 @@ describe('database migrations', () => {
         const constraints = await pool.query(`
         SELECT conname
         FROM pg_constraint
-        WHERE conrelid = 'public.todos'::regclass 
+        WHERE conrelid = 'public.todos'::regclass
         `);
 
         expect(
