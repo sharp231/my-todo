@@ -3,8 +3,8 @@ import { Readable } from 'node:stream';
 import { createResponse } from 'node-mocks-http';
 import { afterAll, beforeEach, describe, expect, test, } from 'vitest';
 
-import pool from '../lib/db.js';
-import { addTodo } from '../lib/queries.js';
+import pool from '../lib/db';
+import { addTodo } from '../lib/queries';
 import handler from '../pages/api/todos.js';
 
 const createJsonRequest = (method, body) => {
@@ -63,6 +63,17 @@ describe('/api/todos database integration', () => {
         expect(response._getStatusCode()).toBe(201);
 
         const body = response._getJSONData();
+        expect(typeof body.id).toBe('string');
+
+        expect(typeof body.created_at).toBe('string');
+        expect(new Date(body.created_at).toISOString()).toBe(
+            body.created_at
+        );
+
+        expect(typeof body.updated_at).toBe('string');
+        expect(new Date(body.updated_at).toISOString()).toBe(
+            body.updated_at
+        );
 
         expect(body).toEqual(
             expect.objectContaining({

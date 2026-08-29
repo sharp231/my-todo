@@ -6,13 +6,13 @@ import {
   test,
 } from 'vitest';
 
-import pool from '../lib/db.js';
+import pool from '../lib/db';
 import {
   addTodo,
   deleteTodo,
   getTodos,
   updateTodo,
-} from '../lib/queries.js';
+} from '../lib/queries';
 
 describe('todo queries', () => {
   beforeEach(async () => {
@@ -42,9 +42,9 @@ describe('todo queries', () => {
       })
     );
 
-    expect(created.id).toBeDefined();
-    expect(created.created_at).toBeDefined();
-    expect(created.updated_at).toBeDefined();
+    expect(typeof created.id).toBe('string');
+    expect(created.created_at).toBeInstanceOf(Date);
+    expect(created.updated_at).toBeInstanceOf(Date);
   });
 
   test('returns todos ordered by created_at descending', async () => {

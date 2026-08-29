@@ -42,11 +42,11 @@ describe('database pool', () => {
     });
 
     test('reuses the pool during development reloads', async () => {
-        const firstImport = await import('../lib/db.js');
+        const firstImport = await import('../lib/db');
 
         vi.resetModules();
 
-        const secondImport = await import('../lib/db.js');
+        const secondImport = await import('../lib/db');
 
         expect(Pool).toHaveBeenCalledTimes(1);
         expect(secondImport.default).toBe(firstImport.default);
