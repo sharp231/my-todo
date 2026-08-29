@@ -1,15 +1,32 @@
 import pool from './db';
 
+const UPDATABLE_TODO_FIELDS = new Set([
+  'title',
+  'date',
+  'priority',
+  'completed',
+]);
+
+const TODO_RESULT_COLUMNS = `
+  id,
+  title,
+  to_char(date, 'YYYY-MM-DD') AS date,
+  priority,
+  completed,
+  created_at,
+  updated_at
+`;
+
 // Todoリストを取得
 export const getTodos = async () => {
-  const result = await pool.query('SELECT * from todos ORDER BY created_at DESC');
+  const result = await pool.query(`SELECT ${TODO_RESULT_COLUMNS}  FROM public.todos todos ORDER BY created_at DESC`);
   return result.rows;
 };
 
 // Todoを追加
 export const addTodo = async (title, date, priority, completed) => {
   const result = await pool.query(
-    'INSERT INTO todos (title, date, priority,completed) VALUES ($1, $2, $3,$4) RETURNING *',
+    `INSERT INTO public.todos (title, date, priority,completed) VALUES ($1, $2, $3,$4) RETURNING ${TODO_RESULT_COLUMNS} `,
     [title, date, priority, completed]
   );
   return result.rows[0];
@@ -17,26 +34,37 @@ export const addTodo = async (title, date, priority, completed) => {
 
 // Todoを削除
 export const deleteTodo = async (id) => {
-  const query = 'DELETE FROM todos WHERE id = $1';
-  const values = [id];
+  const result = await pool.query(
+    'DELETE FROM public.todos WHERE id = $1',
+    [id]);
 
-  const result = await pool.query(query, values);
   return result.rowCount; // 削除された行数を返す
 };
 
 // Todoを更新
 export const updateTodo = async (id, fields) => {
+  if (!fields || typeof fields !== 'object'
+    || Array.isArray(fields)
+  ) {
+    throw new TypeError(
+      'Todo update fields must be an object'
+    );
+  }
   const updates = [];
   const values = [];
-  let index = 1;
 
   // 更新するフィールドを動的に構築
-  for (const [key, value] of Object.entries(fields)) {
-    if (value !== undefined) {
-      updates.push(`${key} = $${index}`);
-      values.push(value);
-      index++;
+  for (const [field, value] of Object.entries(fields)) {
+    //SQL識別子はプレースホルダー化できないため、
+    //許可した列例だけSQLへ展開する
+    if (!UPDATABLE_TODO_FIELDS.has(field)) {
+      throw new Error('Unsupported todo update field');
     }
+    if (value === undefined) {
+      continue;
+    }
+    values.push(value);
+    updates.push(`${field} = $${values.length}`);
   }
   // 更新するフィールドがない場合はエラーをスロー
   if (updates.length === 0) {
@@ -45,8 +73,16 @@ export const updateTodo = async (id, fields) => {
 
   // IDを最後に追加
   values.push(id);
-  const query = `UPDATE todos SET ${updates.join(', ')} WHERE id = $${index} RETURNING *`;
+  const idPlaceholder = `$${values.length}`;
 
-  const result = await pool.query(query, values);
+  const result = await pool.query(
+    `
+    UPDATE public.todos
+    SET ${updates.join(', ')}
+    WHERE id = ${idPlaceholder}
+    RETURNING ${TODO_RESULT_COLUMNS}
+    `,
+    values
+  );
   return result.rows[0]; // 更新後のTodoを返す
 };

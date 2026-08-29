@@ -4,10 +4,10 @@ const { runner } = require('node-pg-migrate');
 const { validateEnv } = require('./db-utils');
 
 async function setupTestDatabase() {
-  validateEnv();
+  const databaseUrl = validateEnv();
 
   await runner({
-    databaseUrl: process.env.TEST_DATABASE_URL,
+    databaseUrl,
     dir: path.resolve(__dirname, '../migrations'),
     direction: 'up',
     migrationsTable: 'schema_migrations',
