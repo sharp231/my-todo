@@ -1,5 +1,6 @@
 import { getTodos, addTodo, deleteTodo, updateTodo } from '../../lib/queries';
 import { ApiError, ERROR_CODES, handleError } from '../../utils/errorHandler';
+import { requireAuthenticatedUserId } from '../../lib/auth';
 import { validateCreateTodoInput, validateReplaceTodoInput, validatePatchTodoInput, validateTodoId } from '../../utils/validation';
 
 export const config = {
@@ -45,20 +46,30 @@ export default async function handler(req, res) {
   res.setHeader('Allow', ALLOWED_METHODS);
 
   try {
+    const userId = requireAuthenticatedUserId(req);
     if (req.method === 'GET') {
-      const todos = await getTodos();
+      const todos = await getTodos(userId);
       return res.status(200).json(todos);
     }
+
+    // 以下は現在の処理を維持
     if (req.method === 'POST') {
       const body = await readJsonBody(req);
       const input = validateCreateTodoInput(body);
-      const newTodo = await addTodo(input.title, input.date, input.priority, input.completed);
+      // POST
+      const newTodo = await addTodo(
+        userId,
+        input.title,
+        input.date,
+        input.priority,
+        input.completed,
+      );
       return res.status(201).json(newTodo);
     }
     if (req.method === 'DELETE') {
       const id = validateTodoId(req.query.id);
-      const deletedCount = await deleteTodo(id);
-
+      // DELETE
+      const deletedCount = await deleteTodo(userId, id);
       if (deletedCount === 0) throw todoNotFound(id);
 
       return res.status(200).json({ message: 'Todo deleted successfully' });
@@ -68,7 +79,8 @@ export default async function handler(req, res) {
       const body = await readJsonBody(req);
       const input = validateReplaceTodoInput(body);
 
-      const updatedTodo = await updateTodo(input.id, {
+      // PUT
+      const updatedTodo = await updateTodo(userId, input.id, {
         title: input.title,
         date: input.date,
         priority: input.priority,
@@ -86,7 +98,12 @@ export default async function handler(req, res) {
     if (req.method === 'PATCH') {
       const body = await readJsonBody(req);
       const input = validatePatchTodoInput(body);
-      const updatedTodo = await updateTodo(input.id, input.fields)
+      // PATCH
+      const updatedTodo = await updateTodo(
+        userId,
+        input.id,
+        input.fields,
+      );
 
       if (!updatedTodo) throw todoNotFound(input.id);
 
@@ -95,7 +112,5 @@ export default async function handler(req, res) {
     throw new ApiError(ERROR_CODES.METHOD_NOT_ALLOWED, `Method ${req.method} NotAllowed`);
   } catch (error) {
     return handleError(res, error);
-
-
   }
 }

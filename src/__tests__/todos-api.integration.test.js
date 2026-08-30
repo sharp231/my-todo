@@ -1,10 +1,18 @@
 import { Readable } from 'node:stream';
 
 import { createResponse } from 'node-mocks-http';
-import { afterAll, beforeEach, describe, expect, test, } from 'vitest';
+import { afterAll, beforeEach, describe, expect, test, vi } from 'vitest';
+
+const { requireAuthenticatedUserIdMock } = vi.hoisted(() => ({
+    requireAuthenticatedUserIdMock: vi.fn(),
+}));
+
+vi.mock('../lib/auth', () => ({
+    requireAuthenticatedUserId: requireAuthenticatedUserIdMock,
+}));
 
 import pool from '../lib/db';
-import { addTodo } from '../lib/queries';
+import { addTodo, getTodos } from '../lib/queries';
 import handler from '../pages/api/todos.js';
 
 const createJsonRequest = (method, body) => {
@@ -21,27 +29,36 @@ const createJsonRequest = (method, body) => {
     return request;
 };
 
-const findTodo = async (id) => {
+const findTodo = async (userId, id) => {
     const result = await pool.query(
         `
         SELECT
-        id,
-        title,
-        to_char(date, 'YYYY-MM-DD') AS date,
-        priority,
-        completed
+            id,
+            user_id,
+            title,
+            to_char(date, 'YYYY-MM-DD') AS date,
+            priority,
+            completed
         FROM public.todos
-        WHERE id = $1
+        WHERE user_id = $1
+          AND id = $2
         `,
-        [id]
+        [userId, id]
     );
+
     return result.rows[0];
 };
 
+const TEST_USER_ID = 'user_test_123';
+const OTHER_USER_ID = 'user_test_456';
+
 describe('/api/todos database integration', () => {
     beforeEach(async () => {
+        vi.clearAllMocks();
+        requireAuthenticatedUserIdMock.mockReturnValue(TEST_USER_ID);
+
         await pool.query(
-            'TRUNCATE TABLE public.todos RESTART IDENTITY'
+            'TRUNCATE TABLE public.todos RESTART IDENTITY',
         );
     });
 
@@ -84,7 +101,7 @@ describe('/api/todos database integration', () => {
             })
         );
 
-        expect(await findTodo(body.id)).toEqual(
+        expect(await findTodo(TEST_USER_ID, body.id)).toEqual(
             expect.objectContaining({
                 title: 'Created through API',
                 completed: true,
@@ -94,6 +111,7 @@ describe('/api/todos database integration', () => {
 
     test('PUT replaces the todo including completed', async () => {
         const created = await addTodo(
+            TEST_USER_ID,
             'Original todo',
             '2099-03-01',
             'low',
@@ -127,7 +145,7 @@ describe('/api/todos database integration', () => {
             })
         );
 
-        expect(await findTodo(created.id)).toEqual(
+        expect(await findTodo(TEST_USER_ID, created.id)).toEqual(
             expect.objectContaining({
                 title: 'Replaced todo',
                 date: '2099-04-01',
@@ -139,6 +157,7 @@ describe('/api/todos database integration', () => {
 
     test('PATCH updates only completed', async () => {
         const created = await addTodo(
+            TEST_USER_ID,
             'Patch target',
             '2099-03-01',
             'low',
@@ -165,14 +184,79 @@ describe('/api/todos database integration', () => {
             })
         );
 
-        expect(await findTodo(created.id)).toEqual(
+        expect(await findTodo(TEST_USER_ID, created.id)).toEqual(
             expect.objectContaining({
+                user_id: TEST_USER_ID,
                 title: 'Patch target',
                 date: '2099-03-01',
                 priority: 'low',
                 completed: true,
             })
         );
+    });
+
+    test('does not update or delete another user todo', async () => {
+        const created = await addTodo(
+            TEST_USER_ID,
+            'Protected todo',
+            '2099-03-01',
+            'medium',
+            false
+        );
+
+        requireAuthenticatedUserIdMock.mockReturnValue(
+            OTHER_USER_ID
+        );
+
+        const patchRequest = createJsonRequest('PATCH', {
+            id: created.id,
+            title: 'Unauthorized update',
+        });
+        const patchResponse = createResponse();
+
+        await handler(patchRequest, patchResponse);
+
+        expect(patchResponse._getStatusCode()).toBe(404);
+
+        const deleteRequest = createJsonRequest('DELETE', {});
+        deleteRequest.query = { id: created.id };
+        const deleteResponse = createResponse();
+
+        await handler(deleteRequest, deleteResponse);
+
+        expect(deleteResponse._getStatusCode()).toBe(404);
+
+        expect(
+            await findTodo(TEST_USER_ID, created.id)
+        ).toEqual(
+            expect.objectContaining({
+                title: 'Protected todo',
+            })
+        );
+    });
+    test('does not accept user_id from the request body', async () => {
+        const request = createJsonRequest('POST', {
+            user_id: OTHER_USER_ID,
+            title: 'Injected owner',
+            date: '2099-03-01',
+            priority: 'high',
+            completed: false,
+        });
+        const response = createResponse();
+
+        await handler(request, response);
+
+        expect(response._getStatusCode()).toBe(400);
+        expect(response._getJSONData()).toEqual(
+            expect.objectContaining({
+                error: expect.objectContaining({
+                    code: 'BAD_REQUEST',
+                }),
+            })
+        );
+
+        expect(await getTodos(TEST_USER_ID)).toEqual([]);
+        expect(await getTodos(OTHER_USER_ID)).toEqual([]);
     });
 });
 

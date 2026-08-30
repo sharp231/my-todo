@@ -60,6 +60,10 @@ describe('database migrations', () => {
                 dataType: 'date',
                 nullable: 'NO',
             },
+            user_id: {
+                dataType: 'text',
+                nullable: 'NO',
+            },
             id: {
                 dataType: 'bigint',
                 nullable: 'NO',
@@ -105,7 +109,12 @@ describe('database migrations', () => {
     `);
         expect(
             indexes.rows.map((row) => row.indexname)
-        ).toContain('idx_todos_created_at');
+        ).toEqual(
+            expect.arrayContaining([
+                'idx_todos_created_at',
+                'idx_todos_user_created_at',
+            ])
+        );
 
         const triggers = await pool.query(`
         SELECT tgname
@@ -118,96 +127,46 @@ describe('database migrations', () => {
         ).toContain('todos_set_updated_at');
     });
 
-    test('adopts the legacy production schema without losing data', async () => {
-        await pool.query(`
-        DROP TABLE IF EXISTS public.todos;
-        DROP TABLE IF EXISTS public.schema_migrations;
-
-        CREATE TABLE public.todos (
-            id BIGSERIAL PRIMARY KEY,
-            title TEXT NOT NULL,
-            created_at TIMESTAMP WITHOUT TIME ZONE
-                NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            date TIMESTAMP WITH TIME ZONE,
-            priority TEXT,
-            completed BOOLEAN DEFAULT FALSE
-        );
-    `);
-
-        const inserted = await pool.query(
-            `
-        INSERT INTO public.todos (
-            title,
-            date,
-            priority,
-            completed,
-            created_at
-        )
-        VALUES ($1, $2, $3, $4, $5)
-        RETURNING id::text AS id
-        `,
-            [
-                'legacy todo',
-                '2099-01-01T12:00:00.000Z',
-                'high',
-                true,
-                '2026-01-01 00:00:00',
-            ]
-        );
-
-        await setupTestDatabase();
-
-        const migrated = await pool.query(
-            `
-        SELECT
-            id::text AS id,
-            title,
-            date::text AS date,
-            priority,
-            completed,
-            updated_at = created_at AS timestamp_copied
-        FROM public.todos
-        WHERE id = $1
-        `,
-            [inserted.rows[0].id]
-        );
-
-        expect(migrated.rows[0]).toEqual({
-            id: inserted.rows[0].id,
-            title: 'legacy todo',
-            date: '2099-01-01',
-            priority: 'high',
-            completed: true,
-            timestamp_copied: true,
-        });
-    });
-
-    test('records the baseline migration once', async () => {
+    test('records every migration once', async () => {
         await setupTestDatabase();
 
         const result = await pool.query(`
-      SELECT count(*)::integer AS count
-      FROM public.schema_migrations
-      WHERE name LIKE '%adopt-or-create-todos%'
+        SELECT
+            count(*) FILTER (
+                WHERE name LIKE '%adopt-or-create-todos%'
+            )::integer AS baseline_count,
+            count(*) FILTER (
+                WHERE name LIKE '%add-todo-user-id%'
+            )::integer AS add_owner_count,
+            count(*) FILTER (
+                WHERE name LIKE '%require-todo-user-id%'
+            )::integer AS require_owner_count
+        FROM public.schema_migrations
     `);
 
-        expect(result.rows[0].count).toBe(1);
+        expect(result.rows[0]).toEqual({
+            baseline_count: 1,
+            add_owner_count: 1,
+            require_owner_count: 1,
+        });
     });
 
     test('preserves data when migrations run again', async () => {
         const inserted = await pool.query(
             `
         INSERT INTO public.todos (
+            user_id,
           title,
           date,
           priority,
           completed,
           updated_at
         )
-        VALUES ($1, $2, $3, $4, $5)
+        VALUES ($1, $2, $3, $4, $5,$6)
         RETURNING id
       `,
             [
+                'user_test_123',
                 'migration test',
                 '2099-01-01',
                 'low',

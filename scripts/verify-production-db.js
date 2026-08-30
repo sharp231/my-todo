@@ -8,6 +8,7 @@ class VerificationError extends Error {
 }
 
 const EXPECTED_COLUMNS = new Map([
+  ['user_id', { dataType: 'text', nullable: 'NO' }],
   ['id', { dataType: 'bigint', nullable: 'NO' }],
   ['title', { dataType: 'text', nullable: 'NO' }],
   ['date', { dataType: 'date', nullable: 'NO' }],
@@ -190,6 +191,14 @@ async function verifyProductionDatabase() {
 
     requireCondition(
       indexes.rows.some(
+        (index) =>
+          index.indexname === 'idx_todos_user_created_at'
+      ),
+      'Index idx_todos_user_created_at does not exist'
+    );
+
+    requireCondition(
+      indexes.rows.some(
         (index) => index.indexname === 'idx_todos_created_at'
       ),
       'Index idx_todos_created_at does not exist'
@@ -210,16 +219,35 @@ async function verifyProductionDatabase() {
     );
 
     const migrationHistory = await client.query(`
-      SELECT count(*)::integer AS migration_count
-      FROM public.schema_migrations
+  SELECT
+    count(*) FILTER (
       WHERE name LIKE '%adopt-or-create-todos%'
-    `);
+    )::integer AS baseline_count,
+    count(*) FILTER (
+      WHERE name LIKE '%add-todo-user-id%'
+    )::integer AS add_owner_count,
+    count(*) FILTER (
+      WHERE name LIKE '%require-todo-user-id%'
+    )::integer AS require_owner_count
+  FROM public.schema_migrations
+`);
+
+    const migrationCounts = migrationHistory.rows[0];
 
     requireCondition(
-      migrationHistory.rows[0].migration_count === 1,
+      migrationCounts.baseline_count === 1,
       'Baseline migration history is invalid'
     );
 
+    requireCondition(
+      migrationCounts.add_owner_count === 1,
+      'Todo owner migration history is invalid'
+    );
+
+    requireCondition(
+      migrationCounts.require_owner_count === 1,
+      'Todo owner constraint migration history is invalid'
+    );
     const dataIntegrity = await client.query(`
       SELECT
         count(*)::text AS total_count,
@@ -227,6 +255,7 @@ async function verifyProductionDatabase() {
           count(*) FILTER (
             WHERE title IS NULL
               OR char_length(btrim(title)) NOT BETWEEN 1 AND 100
+              OR user_id IS NULL
               OR date IS NULL
               OR priority NOT IN ('low', 'medium', 'high')
               OR completed IS NULL

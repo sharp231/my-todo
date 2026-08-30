@@ -18,7 +18,7 @@
     "test:coverage": "cross-env NODE_ENV=test vitest run --coverage",
     "test:db": "cross-env NODE_ENV=test DOTENV_CONFIG_PATH=.env.test node -r dotenv/config node_modules/vitest/vitest.mjs run --config vite.db.config.js",
     "test:full": "yarn test:coverage && yarn test:db",
-    "db:verify:production": "cross-env NODE_ENV=production node scripts/verify-production-db.js",
+    "db:verify:production": "cross-env NODE_ENV=production DOTENV_CONFIG_PATH=.env.local node -r dotenv/config scripts/verify-production-db.js",
     "typecheck": "next typegen && tsc --noEmit"
   },
   "dependencies": {

@@ -26,38 +26,45 @@ const TODO_RESULT_COLUMNS = `
 `;
 
 // Todoリストを取得
-export const getTodos = async () => {
+export const getTodos = async (userId: string): Promise<TodoRecord[]> => {
   const result = await pool.query<TodoRecord>(
-    `SELECT ${TODO_RESULT_COLUMNS}  FROM public.todos todos ORDER BY created_at DESC`,
+    `SELECT ${TODO_RESULT_COLUMNS}  FROM public.todos WHERE user_id = $1 ORDER BY created_at DESC`,
+    [userId],
   );
   return result.rows;
 };
 
 // Todoを追加
 export const addTodo = async (
+  userId: string,
   title: string,
   date: string,
   priority: TodoPriority,
   completed: boolean,
 ): Promise<TodoRecord> => {
   const result = await pool.query<TodoRecord>(
-    `INSERT INTO public.todos (title, date, priority,completed) VALUES ($1, $2, $3,$4) RETURNING ${TODO_RESULT_COLUMNS} `,
-    [title, date, priority, completed],
+    `INSERT INTO public.todos (user_id,title, date, priority,completed) VALUES ($1, $2, $3, $4, $5) RETURNING ${TODO_RESULT_COLUMNS} `,
+    [userId, title, date, priority, completed],
   );
   return result.rows[0];
 };
 
 // Todoを削除
-export const deleteTodo = async (id: TodoIdInput): Promise<number> => {
-  const result = await pool.query('DELETE FROM public.todos WHERE id = $1', [
-    id,
-  ]);
+export const deleteTodo = async (
+  userId: string,
+  id: TodoIdInput,
+): Promise<number> => {
+  const result = await pool.query(
+    'DELETE FROM public.todos WHERE user_id = $1 AND id = $2',
+    [userId, id],
+  );
 
   return result.rowCount ?? 0; // 削除された行数を返す
 };
 
 // Todoを更新
 export const updateTodo = async (
+  userId: string,
   id: TodoIdInput,
   fields: TodoUpdateFields,
 ): Promise<TodoRecord | undefined> => {
@@ -86,6 +93,9 @@ export const updateTodo = async (
   }
 
   // IDを最後に追加
+  values.push(userId);
+  const userIdPlaceholder = `$${values.length}`;
+
   values.push(id);
   const idPlaceholder = `$${values.length}`;
 
@@ -93,7 +103,8 @@ export const updateTodo = async (
     `
     UPDATE public.todos
     SET ${updates.join(', ')}
-    WHERE id = ${idPlaceholder}
+    WHERE user_id = ${userIdPlaceholder}
+       AND id =${idPlaceholder}
     RETURNING ${TODO_RESULT_COLUMNS}
     `,
     values,
