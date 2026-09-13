@@ -13,7 +13,8 @@ vi.mock('../lib/auth', () => ({
 
 import pool from '../lib/db';
 import { addTodo, getTodos } from '../lib/queries';
-import handler from '../pages/api/todos.js';
+import handler from '../pages/api/todos';
+import { title } from 'node:process';
 
 const createJsonRequest = (method, body) => {
     const request = Readable.from([
@@ -258,5 +259,122 @@ describe('/api/todos database integration', () => {
         expect(await getTodos(TEST_USER_ID)).toEqual([]);
         expect(await getTodos(OTHER_USER_ID)).toEqual([]);
     });
+
+    test('PATCH, PUT and DELETE preserve large IDs without affecting a neighboring todo',
+        async () => {
+            const targetId = '9007199254740993';
+            const neighboringId = '9007199254740992';
+
+            // number変換で丸められた場合の誤操作も検出できるよう、
+            // 同じユーザーの隣接IDを用意する。
+            const fixtures = [
+                [targetId, 'Large ID target'],
+                [neighboringId, 'Neighbor must remain'],
+            ];
+
+            for (const [id, title] of fixtures) {
+                await pool.query(
+                    `
+          INSERT INTO public.todos (
+            id,
+            user_id,
+            title,
+            date,
+            priority,
+            completed
+          )
+          VALUES ($1, $2, $3, $4, $5, $6)
+        `,
+                    [
+                        id,
+                        TEST_USER_ID,
+                        title,
+                        '2099-03-01',
+                        'low',
+                        false,
+                    ],
+                );
+            }
+            const patchRequest = createJsonRequest('PATCH', {
+                id: targetId,
+                completed: true,
+            });
+            const patchResponse = createResponse();
+
+            await handler(patchRequest, patchResponse);
+
+            expect(patchResponse._getStatusCode()).toBe(200);
+            expect(patchResponse._getJSONData()).toEqual(
+                expect.objectContaining({
+                    id: targetId,
+                    completed: true,
+                }),
+            );
+            expect(
+                await findTodo(TEST_USER_ID, targetId),).toEqual(
+                    expect.objectContaining({
+                        id: targetId,
+                        completed: true,
+                    }),
+                );
+            expect(await findTodo(TEST_USER_ID, neighboringId),).toEqual(
+                expect.objectContaining({
+                    title: 'Neighbor must remain',
+                    completed: false,
+                }),
+            );
+            const putRequest = createJsonRequest('PUT', {
+                id: targetId,
+                title: 'Replaced large ID target',
+                date: '2099-04-01',
+                priority: 'high',
+                completed: false,
+            });
+            const putResponse = createResponse();
+            await handler(putRequest, putResponse);
+
+            expect(putResponse._getStatusCode()).toBe(200);
+            expect(putResponse._getJSONData()).toEqual(
+                expect.objectContaining({
+                    method: 'PUT',
+                    todo: expect.objectContaining({
+                        id: targetId,
+                        title: 'Replaced large ID target',
+                    }),
+                }),
+            );
+            expect(await findTodo(TEST_USER_ID, targetId),).toEqual(
+                expect.objectContaining({
+                    id: targetId,
+                    title: 'Replaced large ID target',
+                    date: '2099-04-01',
+                    priority: 'high',
+                    completed: false,
+                }),
+            );
+            const deleteRequest = createJsonRequest(
+                'DELETE',
+                {},
+            );
+            deleteRequest.query = { id: targetId };
+            const deleteResponse = createResponse();
+            await handler(deleteRequest, deleteResponse);
+
+            expect(deleteResponse._getStatusCode()).toBe(200);
+            expect(deleteResponse._getJSONData()).toEqual({
+                message: 'Todo deleted successfully',
+            });
+            expect(await findTodo(TEST_USER_ID, targetId),).toBeUndefined();
+            expect(await findTodo(TEST_USER_ID, neighboringId),).toEqual(
+                expect.objectContaining({
+                    id: neighboringId,
+                    title: 'Neighbor must remain',
+                    date: '2099-03-01',
+                    priority: 'low',
+                    completed: false,
+                }),
+            );
+        }
+    )
 });
 
