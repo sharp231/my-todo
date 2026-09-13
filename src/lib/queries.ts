@@ -1,19 +1,23 @@
 import pool from './db';
 import type {
-  TodoIdInput,
+  TodoId,
   TodoPriority,
   TodoRecord,
   TodoUpdateFields,
 } from '@/types/todo';
 
-const UPDATABLE_TODO_FIELDS = [
-  'title',
-  'date',
-  'priority',
-  'completed',
-] as const satisfies readonly (keyof TodoUpdateFields)[];
+const TODO_UPDATE_COLUMNS = {
+  title: 'title',
+  date: 'date',
+  priority: 'priority',
+  completed: 'completed',
+} as const satisfies Record<keyof TodoUpdateFields, string>;
 
-const updatableTodoFieldSet = new Set<string>(UPDATABLE_TODO_FIELDS);
+function isUpdatableTodoField(
+  field: string,
+): field is keyof typeof TODO_UPDATE_COLUMNS {
+  return Object.prototype.hasOwnProperty.call(TODO_UPDATE_COLUMNS, field);
+}
 
 const TODO_RESULT_COLUMNS = `
   id,
@@ -52,7 +56,7 @@ export const addTodo = async (
 // Todoを削除
 export const deleteTodo = async (
   userId: string,
-  id: TodoIdInput,
+  id: TodoId,
 ): Promise<number> => {
   const result = await pool.query(
     'DELETE FROM public.todos WHERE user_id = $1 AND id = $2',
@@ -65,7 +69,7 @@ export const deleteTodo = async (
 // Todoを更新
 export const updateTodo = async (
   userId: string,
-  id: TodoIdInput,
+  id: TodoId,
   fields: TodoUpdateFields,
 ): Promise<TodoRecord | undefined> => {
   if (!fields || typeof fields !== 'object' || Array.isArray(fields)) {
@@ -75,17 +79,20 @@ export const updateTodo = async (
   const values = [];
 
   // 更新するフィールドを動的に構築
-  for (const [field, value] of Object.entries(fields)) {
+  for (const field of Object.keys(fields)) {
     //SQL識別子はプレースホルダー化できないため、
     //許可した列例だけSQLへ展開する
-    if (!updatableTodoFieldSet.has(field)) {
+    if (!isUpdatableTodoField(field)) {
       throw new Error('Unsupported todo update field');
     }
+    const value = fields[field];
     if (value === undefined) {
       continue;
     }
+    const column = TODO_UPDATE_COLUMNS[field];
+
     values.push(value);
-    updates.push(`${field} = $${values.length}`);
+    updates.push(`${column} = $${values.length}`);
   }
   // 更新するフィールドがない場合はエラーをスロー
   if (updates.length === 0) {

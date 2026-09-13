@@ -17,7 +17,7 @@ vi.mock('../lib/queries', () => ({
     updateTodo: vi.fn(),
 }));
 
-import handler from '../pages/api/todos.js';
+import handler from '../pages/api/todos';
 
 
 describe('/api/todos authentication', () => {

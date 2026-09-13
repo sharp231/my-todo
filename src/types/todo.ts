@@ -2,10 +2,6 @@ export type TodoPriority = 'low' | 'medium' | 'high';
 
 export type TodoId = string;
 
-// 現在のvalidateTodoId()がnumberを返すための移行用。
-// 将来はstringへ統一するのが望ましい。
-export type TodoIdInput = TodoId | number;
-
 export interface TodoRecord {
   id: TodoId;
   title: string;
