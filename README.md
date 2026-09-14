@@ -313,8 +313,8 @@ GitHub Actionsでは、主に次の項目を確認します。
 | `GET`    | Todo一覧取得 | なし                                                                                           |
 | `POST`   | Todo新規作成 | `{ "title": "Task", "date": "2025-01-01", "priority": "high", "completed": false }`            |
 | `DELETE` | Todo削除     | `?id=1`                                                                                        |
-| `PUT`    | Todo完全置換 | `{ "id": 1, "title": "Edit", "date": "2025-01-01", "priority": "medium", "completed": false }` |
-| `PATCH`  | Todo部分更新 | `{ "id": 1, "completed": true }`                                                               |
+| `PUT`    | Todo完全置換 | `{ "id": "1", "title": "Edit", "date": "2025-01-01", "priority": "medium", "completed": false }` |
+| `PATCH`  | Todo部分更新 | `{ "id": "1", "completed": true }`                                                               |
 
 `POST` / `PUT` / `PATCH` では、`Content-Type: application/json` を指定してください。
 
@@ -335,7 +335,7 @@ Todo APIでは、リクエスト入力をDB処理の前に検証します。
 | `POST`                         | `title`, `date`, `priority` を必須として検証し、`completed` は未指定時 `false` として扱う |
 | `PUT`                          | 完全置換として `id`, `title`, `date`, `priority`, `completed` をすべて必須にする          |
 | `PATCH`                        | 部分更新として `id` と1つ以上の更新対象フィールドを必須にする                             |
-| `DELETE`                       | query parameter の `id` を正の整数として検証する                                          |
+| `DELETE`                       | query parameter の `id` を正の10進整数を表す文字列として検証する                                          |
 | 想定外フィールド               | `400 BAD_REQUEST` として拒否する                                                          |
 | 型違い・空文字・不正値・`null` | `422 VALIDATION_ERROR` として拒否する                                                     |
 
@@ -420,6 +420,7 @@ APIエラーは以下の形式で統一しています。
 | 404 | `NOT_FOUND` | 対象Todoが存在しない、またはログインユーザーが所有していない場合 |
 | 405 | `METHOD_NOT_ALLOWED` | 許可されていないHTTPメソッド |
 | 409 | `CONFLICT` | PostgreSQLの一意制約違反（`23505`） |
+| 413 | `PAYLOAD_TOO_LARGE` | POST・PUT・PATCHのJSON本文が16,384 bytesを超える場合 |
 | 422 | `VALIDATION_ERROR` | 入力値の型・内容が不正な場合 |
 | 500 | `INTERNAL_ERROR` | 想定外のサーバーエラー |
 | 503 | `SERVICE_UNAVAILABLE` | DBへ接続できない場合 |
