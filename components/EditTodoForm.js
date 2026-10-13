@@ -35,7 +35,7 @@ const EditTodoForm = ({ todo, onSave, onCancel }) => {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.3 }}
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+      className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
       onClick={onCancel} // 背景クリックで閉じる
     >
       <motion.div
@@ -57,7 +57,7 @@ const EditTodoForm = ({ todo, onSave, onCancel }) => {
               type="text"
               value={editText}
               onChange={(e) => setEditText(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-gray-800"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-hidden text-gray-800"
               autoFocus
             />
           </div>
@@ -71,7 +71,7 @@ const EditTodoForm = ({ todo, onSave, onCancel }) => {
                 minDate={today}
                 locale={ja}
                 dateFormat="yyyy年MM月dd日"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-gray-800 block"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-hidden text-gray-800 block"
                 />
             </div>
           </div>
@@ -81,7 +81,7 @@ const EditTodoForm = ({ todo, onSave, onCancel }) => {
             <select
               value={editPriority}
               onChange={(e) => setEditPriority(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-gray-800 bg-white"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-hidden text-gray-800 bg-white"
             >
               <option value="高">高</option>
               <option value="中">中</option>
