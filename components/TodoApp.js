@@ -208,7 +208,7 @@ const TodoApp = () => {
 };
 
 const StatCard = ({ label, value, icon: Icon, color, iconColor }) => (
-  <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+  <div className="bg-white rounded-xl p-4 shadow-xs border border-gray-100">
     <div className="flex items-center justify-between">
       <div>
         <p className="text-sm text-gray-600">{label}</p>
