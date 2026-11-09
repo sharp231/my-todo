@@ -1,6 +1,6 @@
 import { Readable } from 'node:stream';
 
-import { createResponse } from 'node-mocks-http';
+import { createResponse, createRequest } from 'node-mocks-http';
 import { afterAll, beforeEach, describe, expect, test, vi } from 'vitest';
 
 const { requireAuthenticatedUserIdMock } = vi.hoisted(() => ({
@@ -195,6 +195,66 @@ describe('/api/todos database integration', () => {
             })
         );
     });
+    test('GET returns only the authenticated user todos', async () => {
+        const own = await addTodo(
+            TEST_USER_ID,
+            'Own todo',
+            '2099-03-01',
+            'medium',
+            false,
+        );
+        await addTodo(
+            OTHER_USER_ID,
+            'Other user todo',
+            '2099-03-02',
+            'medium',
+            false
+        );
+
+        const request = createRequest({
+            method: 'GET',
+        });
+        const response = createResponse();
+        await handler(request, response);
+
+        expect(response._getStatusCode()).toBe(200);
+        expect(response._getJSONData()).toEqual([
+            expect.objectContaining({
+                id: own.id,
+                title: 'Own todo',
+            }),
+        ]);
+    });
+    test('PUT rejects another user and preserves the original todo', async () => {
+        const created = await addTodo(
+            TEST_USER_ID,
+            'Protected todo',
+            '2099-03-01',
+            'medium',
+            false
+        );
+        const before = await findTodo(TEST_USER_ID, created.id);
+        expect(before).toBeDefined();
+
+        requireAuthenticatedUserIdMock.mockReturnValue(
+            OTHER_USER_ID
+        );
+        const request = createJsonRequest('PUT', {
+            id: created.id,
+            title: 'Unauthorized replacement',
+            date: '2099-04-01',
+            priority: 'high',
+            completed: true,
+        });
+        const response = createResponse();
+        await handler(request, response);
+
+        expect(response._getStatusCode()).toBe(404);
+        expect(response._getJSONData()).toMatchObject({
+            error: { code: 'NOT_FOUND' }
+        });
+        expect(await findTodo(TEST_USER_ID, created.id)).toEqual(before);
+    });
 
     test('does not update or delete another user todo', async () => {
         const created = await addTodo(
@@ -204,11 +264,12 @@ describe('/api/todos database integration', () => {
             'medium',
             false
         );
+        const before = await findTodo(TEST_USER_ID, created.id);
+        expect(before).toBeDefined();
 
         requireAuthenticatedUserIdMock.mockReturnValue(
             OTHER_USER_ID
         );
-
         const patchRequest = createJsonRequest('PATCH', {
             id: created.id,
             title: 'Unauthorized update',
@@ -218,6 +279,10 @@ describe('/api/todos database integration', () => {
         await handler(patchRequest, patchResponse);
 
         expect(patchResponse._getStatusCode()).toBe(404);
+        expect(patchResponse._getJSONData()).toMatchObject({
+            error: { code: 'NOT_FOUND' }
+        });
+        expect(await findTodo(TEST_USER_ID, created.id)).toEqual(before);
 
         const deleteRequest = createJsonRequest('DELETE', {});
         deleteRequest.query = { id: created.id };
@@ -226,14 +291,10 @@ describe('/api/todos database integration', () => {
         await handler(deleteRequest, deleteResponse);
 
         expect(deleteResponse._getStatusCode()).toBe(404);
-
-        expect(
-            await findTodo(TEST_USER_ID, created.id)
-        ).toEqual(
-            expect.objectContaining({
-                title: 'Protected todo',
-            })
-        );
+        expect(deleteResponse._getJSONData()).toMatchObject({
+            error: { code: 'NOT_FOUND' }
+        });
+        expect(await findTodo(TEST_USER_ID, created.id)).toEqual(before);
     });
     test('does not accept user_id from the request body', async () => {
         const request = createJsonRequest('POST', {
@@ -377,4 +438,3 @@ describe('/api/todos database integration', () => {
         }
     )
 });
-
