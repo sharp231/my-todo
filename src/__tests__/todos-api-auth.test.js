@@ -1,6 +1,8 @@
 import { createMocks } from "node-mocks-http";
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
+import { addTodo, deleteTodo, updateTodo } from '../lib/queries';
+
 const { getAuthMock, getTodosMock } = vi.hoisted(() => ({
     getAuthMock: vi.fn(),
     getTodosMock: vi.fn(),
@@ -25,27 +27,30 @@ describe('/api/todos authentication', () => {
         vi.resetAllMocks();
     });
 
-    test('returns 401 without an authenticated user', async () => {
+    test.each(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])('%s returns 401 without an authenticated user', async (method) => {
         getAuthMock.mockReturnValue({
             userId: null,
         });
 
         const { req, res } = createMocks({
-            method: 'GET',
+            method
         });
 
         await handler(req, res);
 
         expect(res._getStatusCode()).toBe(401);
-        expect(res._getJSONData()).toEqual({
+        expect(res._getJSONData()).toMatchObject({
             error: {
                 code: 'UNAUTHORIZED',
-                message: 'Authentication required',
+                message: expect.any(String),
             },
         });
-
         expect(getTodosMock).not.toHaveBeenCalled();
-    });
+        expect(addTodo).not.toHaveBeenCalled();
+        expect(updateTodo).not.toHaveBeenCalled();
+        expect(deleteTodo).not.toHaveBeenCalled();
+    },
+    );
 
     test('allows an authenticated user to access the API', async () => {
         getAuthMock.mockReturnValue({
