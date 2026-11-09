@@ -24,7 +24,7 @@
   "dependencies": {
     "@clerk/backend": "^3.8.2",
     "@clerk/nextjs": "^7.5.7",
-    "@vercel/functions": "^3.9.5",
+    "@vercel/functions": "^3.11.0",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
     "framer-motion": "^11.18.2",
@@ -68,7 +68,8 @@
     "js-yaml": "4.3.2",
     "@babel/core": "7.29.6",
     "sharp": "0.35.5",
-    "**/@vercel/cli-config/zod": "4.6.6",
-    "**/eslint-plugin-react-hooks/zod": "4.6.6"
+    "**/eslint-plugin-react-hooks/zod": "4.6.6",
+    "node-pg-migrate/glob": "14.0.4",
+    "**/@typescript-eslint/typescript-estree/minimatch": "11.0.5"
   }
 }
