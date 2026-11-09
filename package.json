@@ -69,6 +69,6 @@
     "@babel/core": "7.29.6",
     "sharp": "0.35.5",
     "**/@vercel/cli-config/zod": "4.6.6",
-    // "**/eslint-plugin-react-hooks/zod": "4.6.6"
+    "**/eslint-plugin-react-hooks/zod": "4.6.6"
   }
 }
